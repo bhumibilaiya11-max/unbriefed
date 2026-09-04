@@ -169,8 +169,9 @@
             background-size: 22px 22px;
         }
         .brand-mark {
-            width: 30px; height: 30px; flex: none; border-radius: 9999px; border: 2px solid currentColor;
+            width: 30px; height: 30px; flex: none; border-radius: 8px; border: 2px solid currentColor;
             display: flex; align-items: center; justify-content: center; color: #630ed4;
+            transform: rotate(-8deg); box-shadow: 2px 2px 0 currentColor;
         }
         .eyebrow {
             display: inline-flex; align-items: center; gap: 7px; border: 2px solid #1c1b1b; padding: 4px 10px;
@@ -200,6 +201,41 @@
             border-radius: 45% 55% 48% 52% / 55% 45% 58% 42%;
             background: radial-gradient(circle at 60% 60%, #fd761a, transparent 70%);
         }
+        .brand-mark-hero {
+            width: 48px; height: 48px; flex: none; border-radius: 11px; border: 2.5px solid #1c1b1b;
+            display: flex; align-items: center; justify-content: center; color: #630ed4; background: #fff;
+            box-shadow: 3px 3px 0 #1c1b1b; transform: rotate(-6deg); font-size: 24px;
+        }
+        .grain-overlay {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .05; mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        }
+        .grad-text {
+            background: linear-gradient(100deg, #630ed4 20%, #fd761a 90%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .glow-btn { box-shadow: 5px 5px 0 #630ed4; }
+        .glow-btn:hover { box-shadow: 7px 7px 0 #fd761a; }
+        .float-chip {
+            position: absolute; z-index: 4; background: #fff; border: 2px solid #1c1b1b; box-shadow: 3px 3px 0 #1c1b1b;
+            padding: 8px 12px; font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
+            border-radius: 10px; white-space: nowrap; animation: chip-float 5s ease-in-out infinite;
+        }
+        .float-chip b { color: #630ed4; }
+        .float-chip-a { top: 8%; left: 2%; transform: rotate(-7deg); animation-delay: 0s; }
+        .float-chip-b { bottom: 10%; right: 2%; transform: rotate(6deg); animation-delay: .8s; }
+        .float-chip-c { top: 14%; right: 4%; transform: rotate(4deg); animation-delay: 1.6s; }
+        @keyframes chip-float {
+            0%, 100% { translate: 0 0; }
+            50% { translate: 0 -9px; }
+        }
+        .marquee { overflow: hidden; white-space: nowrap; position: relative; z-index: 2; }
+        .marquee-track {
+            display: inline-flex; align-items: center; gap: 16px; padding: 11px 0;
+            animation: marquee 24s linear infinite; will-change: transform;
+        }
+        .marquee-track span.mq-dot { color: #fd761a; }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .magnetic-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #630ed4; }
         .magnetic-btn::after {
             content: ""; position: absolute; inset: 0;
@@ -491,17 +527,30 @@
 </header>
 
 <!-- ================= HERO ================= -->
-<section class="relative overflow-hidden bg-surface border-b-2 border-on-background px-grid-margin py-9 md:py-11">
+<section class="relative overflow-hidden bg-surface border-b-2 border-on-background px-grid-margin pt-14 pb-12 md:pt-20 md:pb-16">
+<div class="grain-overlay" aria-hidden="true"></div>
 <div class="hero-blob-lg hero-blob-lg-a" aria-hidden="true"></div>
 <div class="hero-blob-lg hero-blob-lg-b" aria-hidden="true"></div>
-<div class="max-w-[760px] mx-auto relative z-10 flex flex-col items-center text-center gap-3.5">
-<span class="eyebrow"><span class="dot"></span>AI Strategic Pitch Decks</span>
-<h1 class="font-headline-lg leading-[1.1] tracking-tight text-[24px] md:text-[32px] font-bold max-w-md">Don't send a résumé — send <span class="text-primary">a case.</span></h1>
-<button class="magnetic-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-6 py-2.5 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors" id="hero-cta" type="button">
-Start Your Brief<span class="material-symbols-outlined text-base">arrow_downward</span>
+<div class="float-chip float-chip-a hidden lg:block" aria-hidden="true">📈 <b>0 → 12,000</b> subs in 8mo</div>
+<div class="float-chip float-chip-b hidden lg:block" aria-hidden="true">🎯 <b>−34%</b> CAC in 3 months</div>
+<div class="float-chip float-chip-c hidden lg:block" aria-hidden="true">✦ 8 tones, 0 templates</div>
+<div class="max-w-[820px] mx-auto relative z-10 flex flex-col items-center text-center gap-4">
+<span class="brand-mark-hero"><span class="material-symbols-outlined">bolt</span></span>
+<h1 class="font-headline-lg leading-[0.98] tracking-tight text-[40px] md:text-[72px] font-bold max-w-2xl">Don't send a résumé.<br/>Send <span class="grad-text">a case.</span></h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Unbriefed researches the company, decides the deck's own shape, and writes the pitch in your tone — never a template's.</p>
+<button class="magnetic-btn glow-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-8 py-4 brutalist-border font-headline-md text-headline-md hover:bg-inverse-surface transition-colors mt-2" id="hero-cta" type="button">
+Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 </button>
 </div>
 </section>
+
+<!-- ticker -->
+<div class="marquee bg-on-background text-on-primary border-b-2 border-primary" aria-hidden="true">
+<div class="marquee-track font-label-md text-label-md uppercase tracking-widest">
+<span>Research-Grounded</span><span class="mq-dot">✺</span><span>Role-Aware</span><span class="mq-dot">✺</span><span>Tone-True Writing</span><span class="mq-dot">✺</span><span>No Fixed Templates</span><span class="mq-dot">✺</span><span>8 Strategic Tones</span><span class="mq-dot">✺</span><span>Verbatim Proof Points</span><span class="mq-dot">✺</span>
+<span>Research-Grounded</span><span class="mq-dot">✺</span><span>Role-Aware</span><span class="mq-dot">✺</span><span>Tone-True Writing</span><span class="mq-dot">✺</span><span>No Fixed Templates</span><span class="mq-dot">✺</span><span>8 Strategic Tones</span><span class="mq-dot">✺</span><span>Verbatim Proof Points</span><span class="mq-dot">✺</span>
+</div>
+</div>
 
 <main class="flex-1 max-w-[1440px] mx-auto w-full flex flex-col border-l-2 border-r-2 border-on-background relative">
 <!-- ================= THE BRIEF ================= -->
@@ -524,7 +573,7 @@ Start Your Brief<span class="material-symbols-outlined text-base">arrow_downward
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
 <!-- Company side -->
-<fieldset class="brief-group flex flex-col gap-4">
+<fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #630ed4">
 <legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">domain</span>The Company</legend>
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="company-input">Target Entity</label>
@@ -542,7 +591,7 @@ Start Your Brief<span class="material-symbols-outlined text-base">arrow_downward
 </fieldset>
 
 <!-- Candidate side -->
-<fieldset class="brief-group flex flex-col gap-4">
+<fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #fd761a">
 <legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">person</span>You</legend>
 <div>
 <label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills below)</label>
