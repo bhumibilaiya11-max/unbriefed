@@ -75,6 +75,7 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
   const outlinePanel = $("outline-panel");
   const outlineBadge = $("outline-badge");
   const outlineBody = $("outline-body");
+  const appMain = $("app-main");
   const authBanner = $("auth-banner");
   const authSignedOut = $("auth-signed-out");
   const authSignedIn = $("auth-signed-in");
@@ -251,12 +252,21 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
     const { data, error } = await sb.from("profiles").select("credits").eq("id", session.user.id).single();
     if (!error && data) creditsPillEl.textContent = `${data.credits} credit${data.credits === 1 ? "" : "s"}`;
   }
+  let mainRevealed = false;
   async function updateAuthUI() {
     if (session) {
       authSignedOut.classList.add("hidden"); authSignedOut.classList.remove("flex");
       authSignedIn.classList.remove("hidden"); authSignedIn.classList.add("flex");
       authEmailEl.textContent = session.user.email || "your Google account";
       await refreshCredits();
+      // The Brief/Deck Viewer only exist behind sign-in — reveal them, and scroll down into the
+      // tool the first time (not on every later token-refresh event).
+      if (!mainRevealed) {
+        mainRevealed = true;
+        appMain.classList.remove("hidden");
+        appMain.classList.add("flex", "flex-1");
+        setTimeout(() => companyInput.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+      }
       // A résumé upload blocked on being signed out retries automatically now that we're in.
       if (pendingResumeText) {
         const text = pendingResumeText;
@@ -269,6 +279,9 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
     } else {
       authSignedIn.classList.add("hidden"); authSignedIn.classList.remove("flex");
       authSignedOut.classList.remove("hidden"); authSignedOut.classList.add("flex");
+      mainRevealed = false;
+      appMain.classList.add("hidden");
+      appMain.classList.remove("flex", "flex-1");
     }
   }
   if (sb) {
@@ -407,7 +420,11 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
   // ------------------------------------------------------------------ orchestration
   generateBtn.addEventListener("click", build);
   const scrollToBrief = () => companyInput.scrollIntoView({ behavior: "smooth", block: "center" });
-  [$("nav-cta"), $("nav-cta-mobile"), $("hero-cta")].forEach((btn) => btn && btn.addEventListener("click", scrollToBrief));
+  // Before sign-in, "get started" means the landing gate; once signed in, it means the actual form.
+  const scrollToStart = () => (session ? scrollToBrief() : authBanner.scrollIntoView({ behavior: "smooth", block: "center" }));
+  [$("nav-cta"), $("nav-cta-mobile"), $("hero-cta")].forEach((btn) => btn && btn.addEventListener("click", scrollToStart));
+  const continueToBriefBtn = $("continue-to-brief-btn");
+  continueToBriefBtn && continueToBriefBtn.addEventListener("click", scrollToBrief);
 
   async function build() {
     if (state.busy) return;

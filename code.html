@@ -173,6 +173,17 @@
         .pack-btn .pack-price { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 20px; }
         .pack-btn .pack-credits { font-size: 11px; color: #4a4455; }
         .pack-btn .pack-desc { font-size: 10.5px; color: #4a4455; text-align: center; line-height: 1.3; margin-top: 2px; }
+        .feature-card {
+            border: 2px solid #1c1b1b; background: #fff; padding: 20px; display: flex; flex-direction: column; gap: 8px;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .feature-card:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 #630ed4; }
+        .feature-icon {
+            width: 38px; height: 38px; border-radius: 8px; border: 2px solid #1c1b1b; background: #fff7ed;
+            display: flex; align-items: center; justify-content: center; color: #630ed4;
+        }
+        .feature-title { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 16px; }
+        .feature-desc { font-size: 13px; line-height: 1.5; color: #4a4455; }
         fieldset.brief-group { border: 2px solid #1c1b1b; padding: 16px; }
         fieldset.brief-group > legend {
             font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
@@ -552,7 +563,7 @@
 <h1 class="font-headline-lg leading-[0.98] tracking-tight text-[40px] md:text-[72px] font-bold max-w-2xl">Don't send a résumé.<br/>Send <span class="grad-text">a case.</span></h1>
 <p class="hero-sub text-[19px] md:text-[22px] tracking-tight">Because <em>"I'd love to work here"</em> <span class="accent">isn't enough.</span></p>
 <button class="magnetic-btn glow-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-8 py-4 brutalist-border font-headline-md text-headline-md hover:bg-inverse-surface transition-colors mt-2" id="hero-cta" type="button">
-Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
+Get Started<span class="material-symbols-outlined">arrow_downward</span>
 </button>
 </div>
 </section>
@@ -565,23 +576,52 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 </div>
 </div>
 
-<main class="flex-1 max-w-[1440px] mx-auto w-full flex flex-col border-l-2 border-r-2 border-on-background relative">
-<!-- ================= THE BRIEF ================= -->
-<section class="w-full p-section-padding border-b-2 border-on-background flex flex-col bg-surface z-10 relative overflow-hidden" id="brief-section">
-<div class="max-w-5xl mx-auto w-full flex flex-col gap-6 relative z-10">
-<div>
-<span class="eyebrow mb-3"><span class="dot"></span>Stage 01 · The Input</span>
-<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">The Brief</h1>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
+<!-- ================= LANDING: features + get-started gate ================= -->
+<section class="w-full max-w-[1440px] mx-auto px-grid-margin py-14 md:py-20 border-l-2 border-r-2 border-on-background">
+<div class="max-w-3xl mx-auto text-center mb-10">
+<span class="eyebrow mb-3"><span class="dot"></span>What You Get</span>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg">Not a template. An argument, built for this one company.</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-14">
+<div class="feature-card">
+<span class="feature-icon"><span class="material-symbols-outlined">travel_explore</span></span>
+<h3 class="feature-title">Real Company Research</h3>
+<p class="feature-desc">Pulls from Wikipedia, news, and public sources before a single slide is written — not a template with your name pasted in.</p>
+</div>
+<div class="feature-card">
+<span class="feature-icon"><span class="material-symbols-outlined">work</span></span>
+<h3 class="feature-title">Built For Your Role</h3>
+<p class="feature-desc">8 role lenses — Marketing, Product, Consulting, Finance, Sales, HR, Data, Design — each argues in that function's real vocabulary.</p>
+</div>
+<div class="feature-card">
+<span class="feature-icon"><span class="material-symbols-outlined">edit_note</span></span>
+<h3 class="feature-title">8 Tones That Change the Writing</h3>
+<p class="feature-desc">Bold, Corporate, Playful, Analytical and more — tone reshapes the actual sentences and structure, not just the colours.</p>
+</div>
+<div class="feature-card">
+<span class="feature-icon"><span class="material-symbols-outlined">shuffle</span></span>
+<h3 class="feature-title">No Fixed Template</h3>
+<p class="feature-desc">Slide count, order, and visuals are decided fresh for your specific pitch — a creative pitch and a finance pitch never look alike.</p>
+</div>
+<div class="feature-card">
+<span class="feature-icon"><span class="material-symbols-outlined">verified</span></span>
+<h3 class="feature-title">Your Proof, Verbatim</h3>
+<p class="feature-desc">The achievements you provide are reproduced word-for-word on a dedicated evidence slide, mapped to the company's real problems.</p>
+</div>
+<div class="feature-card">
+<span class="feature-icon"><span class="material-symbols-outlined">upload_file</span></span>
+<h3 class="feature-title">Résumé Auto-Fill + PDF Export</h3>
+<p class="feature-desc">Drop in a PDF, DOCX, or TXT résumé to prefill your profile, then export the finished deck as a polished PDF.</p>
+</div>
 </div>
 
-<!-- Auth + credits — asked up front, before any upload/generate attempt -->
-<div class="brief-banner flex flex-col gap-3" id="auth-banner">
+<!-- Get started — sign in / credits + buy-more, gates the tool below -->
+<div class="brief-banner flex flex-col gap-3 max-w-3xl mx-auto" id="auth-banner">
 
 <!-- Signed OUT -->
 <div class="flex flex-col sm:flex-row sm:items-center gap-3" id="auth-signed-out">
 <div class="flex-1">
-<p class="font-label-md text-label-md uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">bolt</span>Sign in to generate</p>
+<p class="font-label-md text-label-md uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">bolt</span>Get Started</p>
 <p class="font-body-md text-xs text-on-surface-variant mt-1">Google sign-in gets you 3 free full-deck generations — no card required.</p>
 </div>
 <button class="magnetic-btn flex items-center justify-center gap-2 bg-on-background text-on-primary px-5 py-2.5 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors whitespace-nowrap" id="google-signin-btn" type="button">
@@ -606,9 +646,23 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <button class="pack-btn" data-pack="large" type="button"><span class="pack-name">Large</span><span class="pack-price">₹449</span><span class="pack-credits">20 credits</span><span class="pack-desc">Placement season — every company on your list</span></button>
 </div>
 </div>
+<button class="magnetic-btn inline-flex items-center justify-center gap-2 bg-on-background text-on-primary px-6 py-3 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors self-start" id="continue-to-brief-btn" type="button">
+Continue to Your Brief<span class="material-symbols-outlined text-base">arrow_downward</span>
+</button>
 </div>
 
 <p class="field-error" id="auth-error"></p>
+</div>
+</section>
+
+<main class="hidden max-w-[1440px] mx-auto w-full flex-col border-l-2 border-r-2 border-on-background relative" id="app-main">
+<!-- ================= THE BRIEF ================= -->
+<section class="w-full p-section-padding border-b-2 border-on-background flex flex-col bg-surface z-10 relative overflow-hidden" id="brief-section">
+<div class="max-w-5xl mx-auto w-full flex flex-col gap-6 relative z-10">
+<div>
+<span class="eyebrow mb-3"><span class="dot"></span>Stage 01 · The Input</span>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">The Brief</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
 </div>
 
 <!-- Strategic Tone (8) — applies to the whole case, sits above the split -->
