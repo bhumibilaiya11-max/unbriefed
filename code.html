@@ -172,6 +172,7 @@
         .pack-btn .pack-name { font-family: 'Geist', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #4a4455; }
         .pack-btn .pack-price { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 20px; }
         .pack-btn .pack-credits { font-size: 11px; color: #4a4455; }
+        .pack-btn .pack-desc { font-size: 10.5px; color: #4a4455; text-align: center; line-height: 1.3; margin-top: 2px; }
         fieldset.brief-group { border: 2px solid #1c1b1b; padding: 16px; }
         fieldset.brief-group > legend {
             font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
@@ -581,7 +582,7 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <div class="flex flex-col sm:flex-row sm:items-center gap-3" id="auth-signed-out">
 <div class="flex-1">
 <p class="font-label-md text-label-md uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">bolt</span>Sign in to generate</p>
-<p class="font-body-md text-xs text-on-surface-variant mt-1">Google sign-in gets you 3 free generations — no card required.</p>
+<p class="font-body-md text-xs text-on-surface-variant mt-1">Google sign-in gets you 3 free full-deck generations — no card required.</p>
 </div>
 <button class="magnetic-btn flex items-center justify-center gap-2 bg-on-background text-on-primary px-5 py-2.5 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors whitespace-nowrap" id="google-signin-btn" type="button">
 <span class="material-symbols-outlined text-base">login</span>Sign in with Google
@@ -598,11 +599,11 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 </div>
 </div>
 <div class="flex flex-col gap-tight-gap">
-<p class="font-label-md text-xs text-on-surface-variant uppercase">Buy more credits</p>
+<p class="font-label-md text-xs text-on-surface-variant uppercase">Buy more credits <span class="normal-case font-body-md text-on-surface-variant">— 1 credit = 1 full researched, tone-written deck</span></p>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-<button class="pack-btn" data-pack="small" type="button"><span class="pack-name">Small</span><span class="pack-price">$2.99</span><span class="pack-credits">3 credits</span></button>
-<button class="pack-btn" data-pack="medium" type="button"><span class="pack-name">Medium</span><span class="pack-price">$7.99</span><span class="pack-credits">10 credits</span></button>
-<button class="pack-btn" data-pack="large" type="button"><span class="pack-name">Large</span><span class="pack-price">$12.99</span><span class="pack-credits">20 credits</span></button>
+<button class="pack-btn" data-pack="small" type="button"><span class="pack-name">Small</span><span class="pack-price">₹99</span><span class="pack-credits">3 credits</span><span class="pack-desc">Try it — one company, one role</span></button>
+<button class="pack-btn" data-pack="medium" type="button"><span class="pack-name">Medium</span><span class="pack-price">₹249</span><span class="pack-credits">10 credits</span><span class="pack-desc">A focused search — a few companies, a few tones</span></button>
+<button class="pack-btn" data-pack="large" type="button"><span class="pack-name">Large</span><span class="pack-price">₹449</span><span class="pack-credits">20 credits</span><span class="pack-desc">Placement season — every company on your list</span></button>
 </div>
 </div>
 </div>

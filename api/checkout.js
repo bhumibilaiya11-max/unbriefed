@@ -4,10 +4,12 @@
 import Stripe from "stripe";
 import { getUserFromRequest } from "./_supabase.js";
 
+// Priced in INR — student-friendly, with a clear per-credit discount as the pack size grows.
+// amountPaise is the smallest currency unit Stripe expects for INR (paise, 100 = ₹1).
 export const PACKS = {
-  small: { credits: 3, amountCents: 299, label: "Small — 3 credits" },
-  medium: { credits: 10, amountCents: 799, label: "Medium — 10 credits" },
-  large: { credits: 20, amountCents: 1299, label: "Large — 20 credits" },
+  small: { credits: 3, amountPaise: 9900, label: "Small — 3 credits" },
+  medium: { credits: 10, amountPaise: 24900, label: "Medium — 10 credits" },
+  large: { credits: 20, amountPaise: 44900, label: "Large — 20 credits" },
 };
 
 function stripeClient() {
@@ -44,8 +46,8 @@ export default async function handler(req, res) {
       line_items: [
         {
           price_data: {
-            currency: "usd",
-            unit_amount: pack.amountCents,
+            currency: "inr",
+            unit_amount: pack.amountPaise,
             product_data: { name: `Unbriefed — ${pack.label}` },
           },
           quantity: 1,
