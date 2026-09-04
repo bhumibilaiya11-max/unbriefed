@@ -6,3 +6,5 @@ node_modules/
 preview/
 *.log
 npm-debug.log*
+
+.vercel
