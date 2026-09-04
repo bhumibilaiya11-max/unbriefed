@@ -491,15 +491,14 @@
 </header>
 
 <!-- ================= HERO ================= -->
-<section class="relative overflow-hidden bg-surface border-b-2 border-on-background px-grid-margin py-16 md:py-24">
+<section class="relative overflow-hidden bg-surface border-b-2 border-on-background px-grid-margin py-9 md:py-11">
 <div class="hero-blob-lg hero-blob-lg-a" aria-hidden="true"></div>
 <div class="hero-blob-lg hero-blob-lg-b" aria-hidden="true"></div>
-<div class="max-w-[900px] mx-auto relative z-10 flex flex-col items-center text-center gap-5">
-<span class="brand-mark-lg"><span class="material-symbols-outlined">bolt</span></span>
-<h1 class="font-headline-lg leading-[0.95] tracking-tight text-[40px] md:text-[64px] font-bold">Don't send a résumé.<br/>Send <span class="text-primary">a case.</span></h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">Unbriefed researches the company, decides the deck's own shape, and writes the pitch in your tone — never a template's.</p>
-<button class="magnetic-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-7 py-3.5 brutalist-border font-headline-md text-headline-md hover:bg-inverse-surface transition-colors mt-2" id="hero-cta" type="button">
-Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
+<div class="max-w-[760px] mx-auto relative z-10 flex flex-col items-center text-center gap-3.5">
+<span class="eyebrow"><span class="dot"></span>AI Strategic Pitch Decks</span>
+<h1 class="font-headline-lg leading-[1.1] tracking-tight text-[24px] md:text-[32px] font-bold max-w-md">Don't send a résumé — send <span class="text-primary">a case.</span></h1>
+<button class="magnetic-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-6 py-2.5 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors" id="hero-cta" type="button">
+Start Your Brief<span class="material-symbols-outlined text-base">arrow_downward</span>
 </button>
 </div>
 </section>
@@ -507,27 +506,26 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <main class="flex-1 max-w-[1440px] mx-auto w-full flex flex-col border-l-2 border-r-2 border-on-background relative">
 <!-- ================= THE BRIEF ================= -->
 <section class="w-full p-section-padding border-b-2 border-on-background flex flex-col bg-surface z-10 relative overflow-hidden" id="brief-section">
-<div class="max-w-3xl mx-auto w-full flex flex-col gap-6 relative z-10">
+<div class="max-w-5xl mx-auto w-full flex flex-col gap-6 relative z-10">
 <div>
 <span class="eyebrow mb-3"><span class="dot"></span>Stage 01 · The Input</span>
 <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">The Brief</h1>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
 </div>
 
-<!-- Résumé auto-fill -->
-<div>
-<label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills the profile)</label>
-<div class="brutalist-border border-dashed mt-1 p-4 text-center cursor-pointer hover:bg-surface-container transition-colors" id="resume-drop">
-<input accept=".pdf,.txt,.md,.markdown" class="hidden" id="resume-file" type="file"/>
-<span class="resume-drop-icon"><span class="material-symbols-outlined">upload_file</span></span>
-<p class="font-body-md text-sm">Drop a PDF / TXT résumé here, or click to choose</p>
-<p class="font-label-md text-xs text-on-surface-variant mt-1" id="resume-status">No file loaded.</p>
-</div>
+<!-- Strategic Tone (8) — applies to the whole case, sits above the split -->
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase">Strategic Tone</label>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tone-toggle"></div>
+<p class="font-body-md text-xs text-on-surface-variant mt-1" id="tone-hint"></p>
 </div>
 
-<!-- Target -->
+<!-- ============ SPLIT: Company side | Candidate side ============ -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+<!-- Company side -->
 <fieldset class="brief-group flex flex-col gap-4">
-<legend>Target</legend>
+<legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">domain</span>The Company</legend>
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="company-input">Target Entity</label>
 <input class="brutalist-input w-full p-3 font-body-lg text-body-lg" id="company-input" placeholder="e.g., Zomato, Notion, Aranya Beverages…" type="text"/>
@@ -537,22 +535,24 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <label class="font-label-md text-label-md uppercase">Target Role / Field</label>
 <div class="grid grid-cols-2 gap-2" id="role-group"></div>
 </div>
-<div class="flex flex-col gap-tight-gap">
+<div class="flex flex-col gap-tight-gap flex-1">
 <label class="font-label-md text-label-md uppercase" for="context-textarea">Operational Context / The Gap You're Arguing</label>
-<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
+<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none flex-1" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
 </div>
 </fieldset>
 
-<!-- Strategic Tone (8) -->
-<div class="flex flex-col gap-tight-gap">
-<label class="font-label-md text-label-md uppercase">Strategic Tone</label>
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tone-toggle"></div>
-<p class="font-body-md text-xs text-on-surface-variant mt-1" id="tone-hint"></p>
-</div>
-
-<!-- Candidate Profile -->
+<!-- Candidate side -->
 <fieldset class="brief-group flex flex-col gap-4">
-<legend>Candidate Profile</legend>
+<legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">person</span>You</legend>
+<div>
+<label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills below)</label>
+<div class="brutalist-border border-dashed mt-1 p-4 text-center cursor-pointer hover:bg-surface-container transition-colors" id="resume-drop">
+<input accept=".pdf,.txt,.md,.markdown" class="hidden" id="resume-file" type="file"/>
+<span class="resume-drop-icon"><span class="material-symbols-outlined">upload_file</span></span>
+<p class="font-body-md text-sm">Drop a PDF / TXT résumé here, or click to choose</p>
+<p class="font-label-md text-xs text-on-surface-variant mt-1" id="resume-status">No file loaded.</p>
+</div>
+</div>
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="cand-name">Name</label>
 <input class="brutalist-input w-full p-3 font-body-md text-body-md" id="cand-name" type="text" placeholder="Full name"/>
@@ -576,6 +576,8 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <input class="brutalist-input w-full p-3 font-body-md text-body-md" id="cand-skills" type="text" placeholder="SQL, positioning, financial modelling, user research…"/>
 </div>
 </fieldset>
+
+</div>
 
 <div class="hidden flex-col gap-tight-gap" id="access-code-wrap">
 <label class="font-label-md text-label-md uppercase" for="access-code">Access Code</label>
