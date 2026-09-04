@@ -148,6 +148,16 @@
         }
         .chip:hover { background: #e5e2e1; }
         .chip.active { background: #1c1b1b; color: #fff; }
+        .access-code-banner {
+            border: 2px solid #1c1b1b; padding: 14px 16px; background: #fff7ed;
+            box-shadow: 3px 3px 0 #1c1b1b; transition: box-shadow .2s, background .2s;
+        }
+        .access-code-banner.access-code-flash { background: #ffe8d1; box-shadow: 3px 3px 0 #fd761a; animation: flash-pulse 1.6s ease; }
+        @keyframes flash-pulse {
+            0%, 100% { transform: translate(0, 0); }
+            15%, 45% { transform: translate(-2px, -2px); }
+            30%, 60% { transform: translate(0, 0); }
+        }
         fieldset.brief-group { border: 2px solid #1c1b1b; padding: 16px; }
         fieldset.brief-group > legend {
             font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
@@ -550,6 +560,14 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
 </div>
 
+<!-- Access code — asked up front so it's never a surprise mid-upload -->
+<div class="access-code-banner flex flex-col sm:flex-row sm:items-end gap-3" id="access-code-wrap">
+<div class="flex-1 flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="access-code"><span class="material-symbols-outlined text-sm align-middle mr-1">lock</span>Access Code (shared demo)</label>
+<input class="brutalist-input w-full p-3 font-body-md text-sm" id="access-code" type="password" placeholder="Enter the code you were given before uploading or generating" autocomplete="off"/>
+</div>
+</div>
+
 <!-- Strategic Tone (8) — applies to the whole case, sits above the split -->
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase">Strategic Tone</label>
@@ -614,11 +632,6 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 </div>
 </fieldset>
 
-</div>
-
-<div class="hidden flex-col gap-tight-gap" id="access-code-wrap">
-<label class="font-label-md text-label-md uppercase" for="access-code">Access Code</label>
-<input class="brutalist-input w-full p-2 font-body-md text-sm" id="access-code" type="password" placeholder="Ask the deck owner for this hosted demo's code" autocomplete="off"/>
 </div>
 
 <button class="magnetic-btn w-full bg-on-background text-on-primary py-4 font-headline-md text-headline-md brutalist-border hover:bg-inverse-surface transition-colors flex justify-center items-center gap-2" id="generate-btn">

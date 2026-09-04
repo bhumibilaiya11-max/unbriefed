@@ -171,39 +171,49 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
       text = (text || "").replace(/\0/g, "").trim();
       if (text.length < 30) { resumeStatus.textContent = "Couldn't pull enough text from that file — enter details manually."; return; }
 
-      resumeStatus.textContent = "Extracting fields…";
-      const res = await fetch("/api/parse-resume", {
-        method: "POST", headers: authHeaders(), body: JSON.stringify({ text }),
-      });
-      if (res.status === 401) {
-        showAccessCodeNeeded();
-        resumeStatus.textContent = "This hosted demo needs an access code — enter it in the Access Code field below and try again.";
-        return;
-      }
-      if (res.status === 503) {
-        expEl.value = expEl.value || text.slice(0, 1400);
-        resumeStatus.textContent = "AI key not set — résumé auto-fill is off. Raw text dropped into Experience; edit as needed.";
-        return;
-      }
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        resumeStatus.textContent = `Auto-fill failed (${res.status}). ${j.error || "Enter details manually."}`;
-        return;
-      }
-      const d = await res.json();
-      console.log("[Unbriefed] résumé parsed ->", d);
-      if (d.name) nameEl.value = d.name;
-      if (d.education) eduEl.value = d.education;
-      if (d.experience) expEl.value = d.experience;
-      if (d.skills) skillsEl.value = d.skills;
-      if (Array.isArray(d.achievements) && d.achievements.length) achEl.value = d.achievements.join("\n");
-      setInvalid(achEl, achError, validateAchievements(achEl.value));
-      saveBrief();
-      resumeStatus.textContent = `Filled from résumé (${d.achievements?.length || 0} achievements) — review and edit.`;
+      await submitResumeText(text);
     } catch (err) {
       console.error("[Unbriefed] résumé handling failed", err);
       resumeStatus.textContent = "Something went wrong reading that file — enter details manually.";
     }
+  }
+
+  // Extracted text is cached here whenever a parse attempt is blocked by the access-code gate,
+  // so entering the code retries the SAME résumé automatically — no re-upload needed.
+  let pendingResumeText = null;
+
+  async function submitResumeText(text) {
+    resumeStatus.textContent = "Extracting fields…";
+    const res = await fetch("/api/parse-resume", {
+      method: "POST", headers: authHeaders(), body: JSON.stringify({ text }),
+    });
+    if (res.status === 401) {
+      pendingResumeText = text;
+      showAccessCodeNeeded();
+      resumeStatus.textContent = "This hosted demo needs an access code — enter it above, then this résumé retries automatically.";
+      return;
+    }
+    pendingResumeText = null;
+    if (res.status === 503) {
+      expEl.value = expEl.value || text.slice(0, 1400);
+      resumeStatus.textContent = "AI key not set — résumé auto-fill is off. Raw text dropped into Experience; edit as needed.";
+      return;
+    }
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      resumeStatus.textContent = `Auto-fill failed (${res.status}). ${j.error || "Enter details manually."}`;
+      return;
+    }
+    const d = await res.json();
+    console.log("[Unbriefed] résumé parsed ->", d);
+    if (d.name) nameEl.value = d.name;
+    if (d.education) eduEl.value = d.education;
+    if (d.experience) expEl.value = d.experience;
+    if (d.skills) skillsEl.value = d.skills;
+    if (Array.isArray(d.achievements) && d.achievements.length) achEl.value = d.achievements.join("\n");
+    setInvalid(achEl, achError, validateAchievements(achEl.value));
+    saveBrief();
+    resumeStatus.textContent = `Filled from résumé (${d.achievements?.length || 0} achievements) — review and edit.`;
   }
 
   // ------------------------------------------------------------------ persistence
@@ -218,20 +228,27 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
     if (code) h["x-access-code"] = code;
     return h;
   }
-  function showAccessCodeField() {
-    accessCodeWrap.classList.remove("hidden");
-    accessCodeWrap.classList.add("flex");
-  }
+  // The Access Code field is always visible now (asked up front) — this just draws attention to it.
   function showAccessCodeNeeded() {
-    showAccessCodeField();
+    accessCodeWrap.classList.add("access-code-flash");
     accessCodeEl.focus();
+    setTimeout(() => accessCodeWrap.classList.remove("access-code-flash"), 1600);
   }
   accessCodeEl.addEventListener("input", () => {
     try { localStorage.setItem(CODE_KEY, accessCodeEl.value.trim()); } catch {}
   });
+  // If a résumé upload was blocked on a missing/wrong code, retry it automatically once a code
+  // is entered — the user shouldn't have to re-upload the same file.
+  accessCodeEl.addEventListener("change", () => {
+    if (pendingResumeText && accessCodeEl.value.trim()) {
+      const text = pendingResumeText;
+      pendingResumeText = null;
+      submitResumeText(text);
+    }
+  });
   try {
     const savedCode = localStorage.getItem(CODE_KEY);
-    if (savedCode) { accessCodeEl.value = savedCode; showAccessCodeField(); }
+    if (savedCode) accessCodeEl.value = savedCode;
   } catch {}
   function saveBrief() {
     try {
