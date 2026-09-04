@@ -177,7 +177,7 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
       });
       if (res.status === 401) {
         showAccessCodeNeeded();
-        resumeStatus.textContent = "This hosted demo needs an access code — enter it above (Brief panel) and try again.";
+        resumeStatus.textContent = "This hosted demo needs an access code — enter it in the Access Code field below and try again.";
         return;
       }
       if (res.status === 503) {
@@ -444,7 +444,7 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
     });
     if (r.status === 401) {
       showAccessCodeNeeded();
-      throw new Error("This hosted demo needs an access code — enter it above and click Build again.");
+      throw new Error("This hosted demo needs an access code — enter it in the Access Code field and click Build again.");
     }
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || "generate " + r.status);
