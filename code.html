@@ -410,13 +410,10 @@
 <header class="bg-on-background text-primary font-headline-md text-headline-md flex justify-between items-center w-full px-grid-margin py-4 max-w-[1440px] mx-auto z-50 border-b-2 border-primary">
 <div class="font-display-lg text-headline-md uppercase tracking-tighter text-on-primary">Unbriefed</div>
 <nav class="hidden md:flex gap-8 items-center">
-<a class="text-primary-container font-bold border-b-2 border-primary-container pb-1 font-label-md text-label-md" href="#">Generator</a>
-<a class="text-on-primary opacity-80 hover:opacity-100 font-label-md text-label-md hover:text-primary-container transition-colors" href="#">Archive</a>
-<a class="text-on-primary opacity-80 hover:opacity-100 font-label-md text-label-md hover:text-primary-container transition-colors" href="#">Insights</a>
-<a class="text-on-primary opacity-80 hover:opacity-100 font-label-md text-label-md hover:text-primary-container transition-colors" href="#">Methodology</a>
+<button class="text-primary-container font-bold border-b-2 border-primary-container pb-1 font-label-md text-label-md" id="nav-generator" type="button">Generator</button>
 </nav>
 <button class="hidden md:block bg-primary text-on-primary px-6 py-2 brutalist-border font-label-md text-label-md hover:bg-primary-container transition-colors" id="nav-cta">Create Pitch</button>
-<button class="md:hidden text-on-primary"><span class="material-symbols-outlined">menu</span></button>
+<button class="md:hidden text-on-primary" id="nav-cta-mobile" type="button"><span class="material-symbols-outlined">bolt</span></button>
 </header>
 
 <main class="flex-1 max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row border-l-2 border-r-2 border-on-background relative">
