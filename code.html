@@ -107,6 +107,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.12.2/mammoth.browser.min.js"></script>
 <style>
         /* ---- Existing brutalist / editorial system ---- */
         .brutalist-border { border: 2px solid #1c1b1b; }
@@ -583,9 +584,9 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <div>
 <label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills below)</label>
 <div class="brutalist-border border-dashed mt-1 p-4 text-center cursor-pointer hover:bg-surface-container transition-colors" id="resume-drop">
-<input accept=".pdf,.txt,.md,.markdown" class="hidden" id="resume-file" type="file"/>
+<input accept=".pdf,.docx,.txt,.md,.markdown" class="hidden" id="resume-file" type="file"/>
 <span class="resume-drop-icon"><span class="material-symbols-outlined">upload_file</span></span>
-<p class="font-body-md text-sm">Drop a PDF / TXT résumé here, or click to choose</p>
+<p class="font-body-md text-sm">Drop a PDF / DOCX / TXT résumé here, or click to choose</p>
 <p class="font-label-md text-xs text-on-surface-variant mt-1" id="resume-status">No file loaded.</p>
 </div>
 </div>
