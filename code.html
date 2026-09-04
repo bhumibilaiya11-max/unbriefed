@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Unbriefed - AI Strategic Case Generator</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800&amp;family=Geist:wght@600;700&amp;family=Hanken+Grotesk:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Style Guidance -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#732ee4",
+                        "primary-container": "#7c3aed",
+                        "secondary": "#9d4300",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffdbca",
+                        "outline-variant": "#ccc3d8",
+                        "tertiary-fixed": "#ffdcc6",
+                        "surface-container": "#f0eded",
+                        "on-secondary-fixed": "#341100",
+                        "tertiary-container": "#a15100",
+                        "surface": "#fcf9f8",
+                        "secondary-container": "#fd761a",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "on-tertiary-fixed-variant": "#713700",
+                        "on-secondary-fixed-variant": "#783200",
+                        "surface-container-high": "#eae7e7",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-tertiary-fixed": "#301400",
+                        "background": "#fcf9f8",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#ffe0cd",
+                        "surface-variant": "#e5e2e1",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#ede0ff",
+                        "on-background": "#1c1b1b",
+                        "primary": "#630ed4",
+                        "tertiary-fixed-dim": "#ffb784",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#5c2400",
+                        "inverse-surface": "#313030",
+                        "primary-fixed-dim": "#d2bbff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-surface-variant": "#4a4455",
+                        "surface-container-low": "#f6f3f2",
+                        "on-surface": "#1c1b1b",
+                        "inverse-primary": "#d2bbff",
+                        "on-primary-fixed": "#25005a",
+                        "secondary-fixed-dim": "#ffb690",
+                        "surface-container-highest": "#e5e2e1",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#7d3d00",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#7b7487",
+                        "surface-dim": "#dcd9d9",
+                        "primary-fixed": "#eaddff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-padding": "3rem",
+                        "tight-gap": "0.25rem",
+                        "grid-margin": "1rem",
+                        "gutter": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Hanken Grotesk"],
+                        "display-lg": ["Epilogue"],
+                        "headline-lg-mobile": ["Epilogue"],
+                        "headline-md": ["Epilogue"],
+                        "label-md": ["Geist"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "stat-lg": ["Geist"],
+                        "headline-lg": ["Epilogue"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "stat-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<!-- html2canvas + jsPDF for PDF export, pdf.js for résumé text extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+        /* ---- Existing brutalist / editorial system ---- */
+        .brutalist-border { border: 2px solid #1c1b1b; }
+        .brutalist-input {
+            border: 2px solid #1c1b1b;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+        .brutalist-input:focus { outline: none; border-color: #630ed4; }
+        .brutalist-input.invalid { border-color: #ba1a1a; background: #ffdad6; }
+        .magnetic-btn {
+            position: relative; overflow: hidden;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .magnetic-btn:hover { transform: scale(1.02); }
+        .magnetic-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        @keyframes stamp-in {
+            0% { transform: scale(1.08) translateY(-12px); opacity: 0; }
+            70% { transform: scale(0.98) translateY(3px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .slide-enter { animation: stamp-in 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f0eded; border-left: 1px solid #1c1b1b; }
+        ::-webkit-scrollbar-thumb { background: #1c1b1b; }
+        ::-webkit-scrollbar-thumb:hover { background: #630ed4; }
+
+        @keyframes slideRight {
+            0% { width: 0%; left: 0%; } 50% { width: 100%; left: 0%; } 100% { width: 0%; left: 100%; }
+        }
+
+        .field-error { color: #ba1a1a; font-size: 12px; font-weight: 600; margin-top: 4px; min-height: 14px; }
+        .chip {
+            border: 2px solid #1c1b1b; padding: 6px 10px; font-family: 'Geist', sans-serif;
+            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+            background: transparent; transition: background .15s, color .15s; cursor: pointer; text-align: center;
+        }
+        .chip:hover { background: #e5e2e1; }
+        .chip.active { background: #1c1b1b; color: #fff; }
+        fieldset.brief-group { border: 2px solid #1c1b1b; padding: 16px; }
+        fieldset.brief-group > legend {
+            font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
+            letter-spacing: .1em; text-transform: uppercase; padding: 0 8px;
+        }
+
+        .stage-pill {
+            display: flex; align-items: center; gap: 6px; padding: 4px 10px; border: 2px solid #1c1b1b;
+            font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+            opacity: .4;
+        }
+        .stage-pill.active { opacity: 1; background: #630ed4; color: #fff; border-color: #630ed4; }
+        .stage-pill.done { opacity: 1; background: #1c1b1b; color: #fff; }
+
+        /* ================= SLIDE STAGE (fixed design size, scaled to fit) ================= */
+        #stage-wrap { transform-origin: top left; }
+        .slide-stage {
+            width: 1280px; height: 720px; background: #fff; color: #1c1b1b; position: relative; overflow: hidden;
+            font-family: 'Hanken Grotesk', system-ui, sans-serif;
+            --sb: 2px; --shadow: 4px 4px 0 #1c1b1b; --pad: 56px; --gap: 20px;
+            --accent: #630ed4; --htransform: none; --hweight: 800; --hsize: 42px;
+        }
+        .slide-stage * { box-sizing: border-box; }
+        .s-root { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; padding: 0 var(--pad) var(--pad); }
+        .s-banner {
+            margin: 0 calc(-1 * var(--pad)) var(--gap); padding: 12px var(--pad);
+            font-family: 'Geist', sans-serif; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            font-size: 15px; color: #fff; display: flex; align-items: center; gap: 10px; background: var(--accent);
+        }
+        .s-banner .material-symbols-outlined { background: rgba(255,255,255,.18); border-radius: 9999px; padding: 4px; font-size: 15px; }
+        .s-num { margin-left: auto; font-weight: 600; letter-spacing: .05em; opacity: .8; font-size: 12px; }
+
+        /* ===== decorative flourishes — purely graphic, tone-scoped, sit behind the content ===== */
+        .deco { position: absolute; z-index: 0; pointer-events: none; display: none; }
+        .tone-Playful .deco-a {
+            display: block; top: -70px; right: -70px; width: 280px; height: 280px; opacity: .15;
+            border-radius: 58% 42% 55% 45% / 48% 58% 42% 52%; background: radial-gradient(circle at 35% 30%, var(--accent), transparent 72%);
+        }
+        .tone-Playful .deco-b { display: block; left: -36px; bottom: -36px; width: 150px; height: 150px; border-radius: 50%; background: var(--accent); opacity: .08; }
+        .tone-Playful .deco-c {
+            display: block; inset: 0; opacity: .4;
+            background-image: radial-gradient(circle, var(--accent) 4px, transparent 4.5px), radial-gradient(circle, var(--accent) 3px, transparent 3.5px), radial-gradient(circle, var(--accent) 5px, transparent 5.5px);
+            background-repeat: no-repeat; background-position: 91% 16%, 84% 9%, 96% 24%;
+        }
+
+        .tone-Bold .deco-a { display: block; top: 0; right: 0; width: 210px; height: 150px; opacity: .5; background-image: radial-gradient(var(--accent) 2.5px, transparent 3px); background-size: 14px 14px; }
+        .tone-Bold .deco-b { display: block; left: -34px; bottom: -34px; width: 140px; height: 140px; border-radius: 50%; border: 7px solid var(--accent); opacity: .5; }
+
+        .tone-Creative .deco-a {
+            display: block; bottom: -90px; right: -60px; width: 320px; height: 320px; opacity: .17;
+            border-radius: 63% 37% 30% 70% / 50% 45% 55% 50%; background: linear-gradient(135deg, var(--accent), transparent 70%);
+        }
+        .tone-Creative .deco-b { display: block; top: 24px; left: -46px; width: 110px; height: 110px; border-radius: 50%; border: 3px dashed var(--accent); opacity: .45; }
+
+        .tone-Storytelling .deco-a { display: block; left: 0; right: 0; bottom: 42px; height: 2px; opacity: .35; background: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent 8px 16px); }
+
+        .tone-Analytical .deco-a { display: block; top: 0; right: 0; bottom: 0; width: 3px; opacity: .5; background: repeating-linear-gradient(180deg, var(--accent) 0 6px, transparent 6px 14px); }
+        .s-lower { flex: 1; display: flex; flex-direction: column; gap: var(--gap); min-height: 0; }
+        .s-content { display: flex; flex-direction: column; }
+        .s-headline {
+            font-family: 'Epilogue', sans-serif; font-weight: var(--hweight); font-size: var(--hsize);
+            line-height: 1.05; letter-spacing: -0.02em; text-transform: var(--htransform); margin-bottom: 12px;
+        }
+        .s-body { font-size: 17px; line-height: 1.5; max-width: 78ch; }
+        .s-pov {
+            border-left: 4px solid var(--accent); padding-left: 14px; margin-top: 12px;
+            font-weight: 600; font-size: 16px;
+        }
+        .s-stats { display: flex; gap: var(--gap); margin-top: 18px; flex-wrap: wrap; }
+        .s-stat { border: var(--sb) solid #1c1b1b; border-top: 5px solid var(--accent); padding: 12px 16px; flex: 0 1 300px; max-width: 400px; }
+        .s-stat-top { display: flex; align-items: center; gap: 10px; }
+        .s-stat-badge {
+            width: 32px; height: 32px; flex: none; border-radius: 9999px; background: var(--accent); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 19px;
+            overflow: hidden; text-transform: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--accent); opacity: .95;
+        }
+        .s-stat .v { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 24px; line-height: 1.12; color: #1c1b1b; word-break: break-word; }
+        .s-stat .l { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #4a4455; margin-top: 8px; }
+        .s-est {
+            display: inline-block; font-family: 'Geist', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: .08em;
+            padding: 1px 6px; border: 1px solid var(--accent); color: var(--accent); border-radius: 9999px; margin-left: 4px; vertical-align: middle;
+        }
+        .s-visual {
+            flex: 1; border: var(--sb) solid #1c1b1b; box-shadow: var(--shadow); padding: 18px;
+            overflow: hidden; display: flex; flex-direction: column; min-height: 0; background: #fff;
+        }
+        .s-vcap {
+            font-family: 'Geist', sans-serif; font-weight: 700; font-size: 12px; text-transform: uppercase;
+            letter-spacing: .08em; color: #4a4455; margin-bottom: 12px;
+        }
+
+        /* intensity bars */
+        .ib { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+        .ib-row { display: grid; grid-template-columns: 190px 1fr 92px 190px; gap: 12px; align-items: center; margin-bottom: 13px; }
+        .ib-label { font-weight: 600; font-size: 13px; }
+        .ib-track { display: flex; gap: 4px; }
+        .ib-seg { height: 18px; flex: 1; border: 2px solid #1c1b1b; border-radius: 3px; overflow: hidden; }
+        .ib-seg.on { background: linear-gradient(90deg, var(--accent), var(--accent)); box-shadow: inset 0 -3px 0 rgba(0,0,0,.15); }
+        .ib-val { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 16px; text-align: right; color: #1c1b1b; }
+        .ib-note { font-size: 11px; color: #4a4455; }
+
+        /* comparison table */
+        .ct { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .ct th { background: #1c1b1b; color: #fff; text-align: left; padding: 8px 10px; font-family: 'Geist', sans-serif; text-transform: uppercase; letter-spacing: .05em; font-size: 11px; }
+        .ct td { padding: 8px 10px; border-bottom: 1px solid #1c1b1b; vertical-align: top; }
+        .ct tr:nth-child(even) td { background: #f0eded; }
+
+        /* matrix 2x2 — axis labels sit in their own row above the grid, never overlapping it */
+        .mx-axes { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 10px; }
+        .mx-axes span { display: flex; align-items: center; gap: 6px; font-family: 'Geist', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #4a4455; }
+        .mx-axes .ax { font-size: 15px; line-height: 1; color: var(--accent); }
+        .mx { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; border: 3px solid #1c1b1b; }
+        .mx-q { border: 1px solid #1c1b1b; padding: 12px 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        .mx-q .n { font-family: 'Geist', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 12px; color: var(--accent); }
+        .mx-q .t { font-size: 10px; color: #4a4455; margin: 3px 0 6px; }
+        .mx-q ul { margin: 0; padding-left: 16px; font-size: 12px; }
+
+        /* timeline */
+        .tl { display: flex; flex: 1; }
+        .tl-node { flex: 1; padding: 0 12px; position: relative; }
+        .tl-node::before { content: ''; position: absolute; top: 13px; left: 0; right: 0; height: 3px; background: #1c1b1b; }
+        .tl-node:first-child::before { left: 50%; }
+        .tl-node:last-child::before { right: 50%; }
+        .tl-dot { width: 28px; height: 28px; border-radius: 9999px; background: var(--accent); border: 3px solid #1c1b1b; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; margin: 0 auto; }
+        .tl-node .tt { font-family: 'Epilogue', sans-serif; font-weight: 700; margin: 10px 0 6px; font-size: 15px; text-align: center; }
+        .tl-node ul { margin: 0; padding-left: 16px; font-size: 12px; }
+
+        /* step flow */
+        .sf { display: flex; align-items: stretch; flex: 1; }
+        .sf-step { flex: 1; border: 2px solid #1c1b1b; padding: 14px; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+        .sf-step .sl { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--accent); }
+        .sf-step .st { font-size: 12px; }
+        .sf-arrow { display: flex; align-items: center; padding: 0 6px; font-size: 22px; }
+
+        /* metric callout */
+        .mc { display: flex; gap: 16px; flex: 1; align-items: center; justify-content: center; }
+        .mc.n1 .mc-m { flex: 0 1 460px; }
+        .mc.n2 .mc-m { flex: 0 1 380px; }
+        .mc-m { flex: 1; border: 2px solid #1c1b1b; border-left: 6px solid var(--accent); padding: 20px 22px; min-height: 130px; max-height: 220px; display: flex; flex-direction: column; justify-content: center; }
+        .mc-m .v { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 38px; line-height: 1; }
+        .mc-m .l { font-size: 12px; text-transform: uppercase; color: #4a4455; margin-top: 8px; }
+        .mc-m .d { font-size: 12px; font-weight: 700; margin-top: 4px; color: var(--accent); }
+
+        /* mapping table (evidence) */
+        .mp { display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: auto; }
+        .mp-row { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 2px solid #1c1b1b; }
+        .mp-cell { padding: 10px 12px; font-size: 12px; border-right: 1px solid #1c1b1b; }
+        .mp-cell:last-child { border-right: 0; }
+        .mp-cell .h { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; color: #4a4455; margin-bottom: 4px; }
+        .mp-cell.ach { background: #ede0ff; font-weight: 600; }
+
+        /* phase plan (roadmap) */
+        .pp { display: flex; gap: 14px; flex: 1; }
+        .pp-col { flex: 1; border: 2px solid #1c1b1b; display: flex; flex-direction: column; }
+        .pp-col .w { background: var(--accent); color: #fff; padding: 8px 10px; font-family: 'Geist', sans-serif; font-weight: 700; font-size: 12px; text-transform: uppercase; }
+        .pp-col .f { padding: 8px 10px; font-weight: 700; font-size: 13px; border-bottom: 1px solid #1c1b1b; }
+        .pp-col ul { margin: 0; padding: 10px 10px 10px 26px; font-size: 12px; }
+        .pp-col li { margin-bottom: 4px; }
+
+        /* donut chart — real conic-gradient graph, not a placeholder box */
+        .donut-wrap { display: flex; gap: 32px; align-items: center; flex: 1; }
+        .donut { width: 172px; height: 172px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #1c1b1b; }
+        .donut-hole { width: 104px; height: 104px; border-radius: 50%; background: #fff; border: 2px solid #1c1b1b; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6px; }
+        .donut-hole .v { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 26px; line-height: 1; }
+        .donut-hole .l { font-size: 9px; text-transform: uppercase; letter-spacing: .04em; color: #4a4455; margin-top: 4px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 12px; }
+        .donut-legend .row { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+        .donut-legend .sw { width: 14px; height: 14px; border: 2px solid #1c1b1b; flex: none; }
+
+        /* moodboard — gradient "photo" tiles standing in for imagery on editorial slides */
+        .mb-grid { flex: 1; display: grid; gap: 14px; }
+        .mb-grid.n1, .mb-grid.n2 { grid-template-columns: 1fr 1fr; }
+        .mb-grid.n3 { grid-template-columns: 1fr 1fr 1fr; }
+        .mb-grid.n4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .mb-tile {
+            border-radius: 6px; color: #fff; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
+            padding: 16px; position: relative; overflow: hidden; box-shadow: 0 0 0 2px #1c1b1b;
+        }
+        .mb-tile .material-symbols-outlined { position: absolute; top: 14px; right: 14px; font-size: 26px; opacity: .9; }
+        .mb-l { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 15px; line-height: 1.2; text-shadow: 0 1px 6px rgba(0,0,0,.35); }
+        .tone-Playful .mb-tile, .tone-Creative .mb-tile { border-radius: 20px; }
+
+        /* ===== per-tone visual treatments — structure only; --accent is set per tone by app.js ===== */
+        .slide-stage.tone-Bold        { --sb: 5px; --shadow: 14px 14px 0 #1c1b1b; --hsize: 56px; --hweight: 800; --htransform: uppercase; --pad: 52px; --gap: 18px; }
+        .slide-stage.tone-Strategic   { --sb: 2px; --shadow: 4px 4px 0 #1c1b1b; --hsize: 40px; }
+        .slide-stage.tone-Corporate   { --sb: 1px; --shadow: none; --hsize: 33px; --hweight: 700; --pad: 70px; --gap: 24px; }
+        .slide-stage.tone-Creative    { --sb: 2px; --shadow: 10px 10px 0 var(--accent); --hsize: 47px; --pad: 54px; }
+        .slide-stage.tone-Playful     { --sb: 3px; --shadow: 10px 10px 0 var(--accent); --hsize: 45px; }
+        .slide-stage.tone-Minimal     { --sb: 1px; --shadow: none; --hsize: 30px; --hweight: 700; --pad: 88px; --gap: 32px; }
+        .slide-stage.tone-Analytical  { --sb: 2px; --shadow: none; --hsize: 32px; --pad: 46px; --gap: 14px; }
+        .slide-stage.tone-Storytelling{ --sb: 2px; --shadow: 4px 4px 0 var(--accent); --hsize: 38px; --pad: 60px; }
+
+        /* Bold: mostly black/white with a loud accent used sparingly and hard */
+        .slide-stage.tone-Bold .s-banner { background: #111; color: #fff; border-bottom: 7px solid var(--accent); letter-spacing: .16em; }
+        .slide-stage.tone-Bold .s-banner .material-symbols-outlined { color: var(--accent); }
+        .slide-stage.tone-Bold .s-body { font-size: 19px; font-weight: 600; }
+        .slide-stage.tone-Bold .s-stat { border-top-width: 8px; }
+
+        .slide-stage.tone-Minimal .s-stat:nth-child(n+3) { display: none; }
+        .slide-stage.tone-Minimal .s-stat { border-top-width: 2px; }
+        .slide-stage.tone-Minimal .s-stat-badge { background: none; box-shadow: none; color: var(--accent); font-size: 22px; }
+        .slide-stage.tone-Minimal .ib-row { grid-template-columns: 170px 1fr 64px; }
+        .slide-stage.tone-Minimal .ib-note { display: none; }
+        .slide-stage.tone-Minimal .s-banner { background: #fff; color: #1c1b1b; border-bottom: 2px solid #1c1b1b; }
+        .slide-stage.tone-Minimal .s-banner .material-symbols-outlined { color: var(--accent); }
+
+        .slide-stage.tone-Analytical .s-stat .v,
+        .slide-stage.tone-Analytical .mc-m .v,
+        .slide-stage.tone-Analytical .ib-val { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+        .slide-stage.tone-Analytical .s-visual { background-image: linear-gradient(#0000000d 1px, transparent 1px), linear-gradient(90deg, #0000000d 1px, transparent 1px); background-size: 24px 24px; }
+
+        .slide-stage.tone-Creative .s-lower { flex-direction: row; align-items: stretch; }
+        .slide-stage.tone-Creative .s-content { flex: 0 0 40%; }
+        .slide-stage.tone-Creative .s-visual { flex: 1; }
+        .slide-stage.tone-Creative .s-stats { flex-direction: column; }
+
+        .slide-stage.tone-Playful .s-stat { border-radius: 16px; }
+        .slide-stage.tone-Playful .s-banner { border-radius: 0 0 18px 0; }
+        .slide-stage.tone-Playful .s-stat-badge { transform: rotate(-6deg); }
+        .slide-stage.tone-Playful .ib-seg.on, .slide-stage.tone-Playful .mx { border-radius: 4px; overflow: hidden; }
+
+        .slide-stage.tone-Storytelling .s-content::before {
+            content: "◆ " attr(data-beat); font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 700;
+            letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 8px;
+        }
+
+        /* ===== deck MOOD (chosen per-request by the outline step) ===== */
+        .slide-stage.mood-editorial { --gap: 30px; }
+        .slide-stage.mood-editorial .s-headline { font-size: 60px; line-height: 1.02; }
+        .slide-stage.mood-editorial .s-body { font-size: 20px; line-height: 1.55; max-width: 58ch; }
+        .slide-stage.mood-editorial .s-lower { flex-direction: row; align-items: stretch; gap: 40px; }
+        .slide-stage.mood-editorial .s-content { flex: 1 1 46%; justify-content: center; }
+        .slide-stage.mood-editorial .s-root.no-visual .s-content { flex-basis: 100%; }
+        .slide-stage.mood-editorial .s-visual { flex: 1 1 54%; border: 0; box-shadow: none; padding: 0; }
+        .s-root.no-visual .s-lower { flex-direction: column; }
+        .slide-stage.mood-editorial .s-stat { border-width: 0; border-top-width: 4px; padding-left: 0; padding-right: 24px; }
+        .slide-stage.mood-infographic { --gap: 14px; }
+        .slide-stage.mood-infographic .s-headline { font-size: 30px; line-height: 1.05; }
+        .slide-stage.mood-infographic .s-body { font-size: 15px; line-height: 1.45; }
+
+        /* ===== text-forward visuals ===== */
+        .stmt { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+        .stmt-l {
+            font-family: 'Epilogue', sans-serif; font-weight: 800; font-size: 40px; line-height: 1.05;
+            letter-spacing: -0.02em; color: #1c1b1b;
+        }
+        .stmt-l:nth-child(even) { color: var(--accent); }
+        .quote { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding-left: 20px; }
+        .quote-mark { position: absolute; left: -8px; top: -18px; font-family: 'Epilogue', sans-serif; font-size: 90px; line-height: 1; color: var(--accent); opacity: .3; }
+        .quote-t { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.25; }
+        .quote-a { margin-top: 16px; font-family: 'Geist', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: #4a4455; }
+        .bignum { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+        .bignum-v { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 120px; line-height: .9; color: var(--accent); letter-spacing: -0.03em; }
+        .bignum-l { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 22px; margin-top: 10px; }
+        .bignum-s { font-size: 14px; color: #4a4455; margin-top: 6px; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-on-background text-primary font-headline-md text-headline-md flex justify-between items-center w-full px-grid-margin py-4 max-w-[1440px] mx-auto z-50 border-b-2 border-primary">
+<div class="font-display-lg text-headline-md uppercase tracking-tighter text-on-primary">Unbriefed</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-primary-container font-bold border-b-2 border-primary-container pb-1 font-label-md text-label-md" href="#">Generator</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 font-label-md text-label-md hover:text-primary-container transition-colors" href="#">Archive</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 font-label-md text-label-md hover:text-primary-container transition-colors" href="#">Insights</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 font-label-md text-label-md hover:text-primary-container transition-colors" href="#">Methodology</a>
+</nav>
+<button class="hidden md:block bg-primary text-on-primary px-6 py-2 brutalist-border font-label-md text-label-md hover:bg-primary-container transition-colors" id="nav-cta">Create Pitch</button>
+<button class="md:hidden text-on-primary"><span class="material-symbols-outlined">menu</span></button>
+</header>
+
+<main class="flex-1 max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row border-l-2 border-r-2 border-on-background relative">
+<!-- ================= LEFT: THE BRIEF ================= -->
+<section class="w-full lg:w-5/12 p-section-padding border-b-2 lg:border-b-0 lg:border-r-2 border-on-background flex flex-col gap-6 bg-surface z-10">
+<div>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">The Brief</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Every parameter below changes the argument, not just the styling.</p>
+</div>
+
+<!-- Résumé auto-fill -->
+<div>
+<label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills the profile)</label>
+<div class="brutalist-border border-dashed mt-1 p-4 text-center cursor-pointer hover:bg-surface-container transition-colors" id="resume-drop">
+<input accept=".pdf,.txt,.md,.markdown" class="hidden" id="resume-file" type="file"/>
+<span class="material-symbols-outlined text-3xl opacity-60">upload_file</span>
+<p class="font-body-md text-sm">Drop a PDF / TXT résumé here, or click to choose</p>
+<p class="font-label-md text-xs text-on-surface-variant mt-1" id="resume-status">No file loaded.</p>
+</div>
+</div>
+
+<!-- Target -->
+<fieldset class="brief-group flex flex-col gap-4">
+<legend>Target</legend>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="company-input">Target Entity</label>
+<input class="brutalist-input w-full p-3 font-body-lg text-body-lg" id="company-input" placeholder="e.g., Zomato, Notion, Aranya Beverages…" type="text"/>
+<p class="field-error" id="company-error"></p>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase">Target Role / Field</label>
+<div class="grid grid-cols-2 gap-2" id="role-group"></div>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="context-textarea">Operational Context / The Gap You're Arguing</label>
+<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
+</div>
+</fieldset>
+
+<!-- Strategic Tone (8) -->
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase">Strategic Tone</label>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tone-toggle"></div>
+<p class="font-body-md text-xs text-on-surface-variant mt-1" id="tone-hint"></p>
+</div>
+
+<!-- Candidate Profile -->
+<fieldset class="brief-group flex flex-col gap-4">
+<legend>Candidate Profile</legend>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="cand-name">Name</label>
+<input class="brutalist-input w-full p-3 font-body-md text-body-md" id="cand-name" type="text" placeholder="Full name"/>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="cand-education">Education / Background</label>
+<textarea class="brutalist-input w-full min-h-[64px] p-3 font-body-md text-body-md resize-none" id="cand-education" placeholder="Degrees, institutions, years, notable coursework"></textarea>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="cand-experience">Work / Project Experience</label>
+<textarea class="brutalist-input w-full min-h-[90px] p-3 font-body-md text-body-md resize-none" id="cand-experience" placeholder="Roles and what you actually did — real detail, not just titles"></textarea>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="cand-achievements">Key Achievements / Proof Points</label>
+<p class="font-body-md text-xs text-on-surface-variant">One per line. These are quoted close to verbatim on the evidence slide — write them the way you want them to appear.</p>
+<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="cand-achievements" placeholder="Grew newsletter from 0 to 12,000 subscribers in 8 months&#10;Cut onboarding drop-off from 40% to 22% by rebuilding the first-run flow&#10;Ran a 6-person case team to a national final"></textarea>
+<p class="field-error" id="achievements-error"></p>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="cand-skills">Core Skills</label>
+<input class="brutalist-input w-full p-3 font-body-md text-body-md" id="cand-skills" type="text" placeholder="SQL, positioning, financial modelling, user research…"/>
+</div>
+</fieldset>
+
+<div class="flex flex-col gap-tight-gap" id="access-code-wrap" hidden>
+<label class="font-label-md text-label-md uppercase" for="access-code">Access Code</label>
+<input class="brutalist-input w-full p-2 font-body-md text-sm" id="access-code" type="password" placeholder="Ask the deck owner for this hosted demo's code" autocomplete="off"/>
+</div>
+
+<button class="magnetic-btn w-full bg-on-background text-on-primary py-4 font-headline-md text-headline-md brutalist-border hover:bg-inverse-surface transition-colors flex justify-center items-center gap-2" id="generate-btn">
+<span class="material-symbols-outlined">bolt</span> Research + Build My Case
+        </button>
+<p class="field-error text-center" id="global-error"></p>
+</section>
+
+<!-- ================= RIGHT: DECK VIEWER ================= -->
+<section class="w-full lg:w-7/12 bg-surface-container-low p-grid-margin lg:p-section-padding flex flex-col relative overflow-hidden scroll-mt-4" id="deck-viewer">
+<div class="flex justify-between items-start mb-4 gap-4">
+<div>
+<h2 class="font-headline-md text-headline-md">Deck Viewer</h2>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" id="viewer-status">Awaiting Generation</p>
+</div>
+<button class="hidden items-center gap-2 border-2 border-on-background px-4 py-2 font-label-md text-label-md hover:bg-on-background hover:text-on-primary transition-colors" id="download-btn">
+<span class="material-symbols-outlined">download</span> Export PDF
+        </button>
+</div>
+
+<!-- staged progress -->
+<div class="flex flex-wrap gap-2 mb-3" id="stage-track">
+<span class="stage-pill" data-stage="research"><span class="material-symbols-outlined text-sm">travel_explore</span>Research</span>
+<span class="stage-pill" data-stage="assemble"><span class="material-symbols-outlined text-sm">tune</span>Plan Shape</span>
+<span class="stage-pill" data-stage="write"><span class="material-symbols-outlined text-sm">edit_note</span>Write Slides</span>
+<span class="stage-pill" data-stage="done"><span class="material-symbols-outlined text-sm">check</span>Done</span>
+</div>
+
+<!-- confidence banner -->
+<div class="hidden font-body-md text-sm px-3 py-2 brutalist-border mb-3" id="conf-banner"></div>
+
+<!-- deck outline (Step A) -->
+<details class="brutalist-border mb-3 hidden" id="outline-panel">
+<summary class="cursor-pointer select-none px-3 py-2 font-label-md text-label-md uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">account_tree</span> Deck Outline
+          <span class="ml-auto font-body-md text-xs normal-case" id="outline-badge"></span>
+</summary>
+<div class="px-3 pb-3">
+<pre class="font-body-md text-xs whitespace-pre-wrap max-h-56 overflow-auto bg-surface-container p-3 border-2 border-on-background" id="outline-body"></pre>
+</div>
+</details>
+
+<!-- research dossier -->
+<details class="brutalist-border mb-3 hidden" id="research-panel">
+<summary class="cursor-pointer select-none px-3 py-2 font-label-md text-label-md uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">description</span> Research Dossier
+          <span class="ml-auto font-body-md text-xs normal-case" id="research-badge"></span>
+</summary>
+<div class="px-3 pb-3">
+<pre class="font-body-md text-xs whitespace-pre-wrap max-h-56 overflow-auto bg-surface-container p-3 border-2 border-on-background" id="research-body"></pre>
+<div class="flex flex-wrap gap-2 mt-2" id="research-sources"></div>
+</div>
+</details>
+
+<!-- slide canvas -->
+<div class="relative w-full aspect-[16/9] bg-white brutalist-border shadow-[6px_6px_0px_#1c1b1b] overflow-hidden" id="slide-canvas">
+<div class="absolute inset-0 text-center flex flex-col items-center justify-center gap-4 text-on-surface-variant p-8" id="empty-state">
+<span class="material-symbols-outlined text-6xl opacity-50">analytics</span>
+<p class="font-body-lg text-body-lg max-w-md">Fill in The Brief. Unbriefed researches the company first, then writes an eight-slide case tailored to the role and tone.</p>
+</div>
+<div class="absolute top-0 left-0 hidden" id="stage-wrap"><div class="slide-stage" id="slide-stage"></div></div>
+<div class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex-col items-center justify-center hidden" id="loading-overlay" style="display:none;">
+<span class="material-symbols-outlined text-6xl animate-spin text-primary">sync</span>
+<p class="font-headline-md text-headline-md mt-4" id="loading-label">Working…</p>
+<div class="w-64 h-2 border-2 border-on-background mt-4 overflow-hidden relative">
+<div class="absolute top-0 left-0 h-full bg-primary animate-[slideRight_1.5s_infinite]"></div>
+</div>
+</div>
+</div>
+
+<!-- viewer controls -->
+<div class="hidden mt-6 justify-between items-center w-full px-2" id="viewer-controls">
+<button class="p-2 border-2 border-on-background hover:bg-surface-variant transition-colors disabled:opacity-50" id="prev-slide"><span class="material-symbols-outlined">arrow_back</span></button>
+<div class="flex gap-2 flex-wrap justify-center" id="slide-dots"></div>
+<button class="p-2 border-2 border-on-background hover:bg-surface-variant transition-colors disabled:opacity-50" id="next-slide"><span class="material-symbols-outlined">arrow_forward</span></button>
+</div>
+<p class="font-body-md text-xs text-on-surface-variant mt-2" id="slide-caption"></p>
+</section>
+</main>
+
+<footer class="bg-on-background text-on-primary font-label-md text-label-md uppercase w-full py-8 px-grid-margin flex flex-col md:flex-row justify-between items-center gap-tight-gap z-50 border-t-2 border-primary">
+<div class="font-display-lg text-on-primary mb-4 md:mb-0">Unbriefed</div>
+<div class="text-primary-container text-center md:text-left mb-4 md:mb-0">© 2024 Unbriefed Strategic Labs. Confidential Consulting Framework.</div>
+<div class="flex gap-6 flex-wrap justify-center">
+<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Framework Documentation</a>
+<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Contact Analyst</a>
+</div>
+</footer>
+
+<!-- offscreen full-size stage used only for PDF rasterisation -->
+<div class="slide-stage" id="pdf-stage" style="position:fixed; left:-99999px; top:0; z-index:-1;"></div>
+
+<script type="module" src="app.js"></script>
+</body></html>
