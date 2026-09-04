@@ -43,8 +43,9 @@ vercel env add GROQ_API_KEY production
 vercel env add GROQ_MODEL production
 vercel env add SUPABASE_URL production
 vercel env add SUPABASE_SERVICE_ROLE_KEY production
-vercel env add STRIPE_SECRET_KEY production
-vercel env add STRIPE_WEBHOOK_SECRET production
+vercel env add RAZORPAY_KEY_ID production
+vercel env add RAZORPAY_KEY_SECRET production
+vercel env add RAZORPAY_WEBHOOK_SECRET production
 vercel --prod
 ```
 
@@ -57,8 +58,11 @@ The generation routes cost real Groq tokens on every call, so they sit behind Go
 - `/api/generate` spends one credit atomically (`spend_credit()` in Postgres) and refunds it if
   the call falls back to the offline placeholder (Groq outage / rate limit).
 - `/api/parse-resume` and `/api/outline` just require sign-in, no credit cost.
-- More credits are bought via Stripe Checkout (`api/checkout.js`); `api/stripe-webhook.js`
-  verifies the payment and credits the account (`add_credits()`), idempotently.
+- More credits are bought via Razorpay (`api/checkout.js` creates the order, the browser opens
+  Razorpay's checkout modal). Two paths credit the account, both funnelling through the same
+  idempotent `creditForPayment()` so whichever fires first wins: `api/razorpay-verify.js` (fast —
+  called by the browser the instant the modal reports success) and `api/razorpay-webhook.js`
+  (reliable backstop on `payment.captured`, in case the browser call never fires).
 
 Run `supabase_setup.sql` once in the Supabase project's SQL Editor before any of this works.
 `SUPABASE_URL` / `SUPABASE_ANON_KEY` are also hardcoded in `app.js` — that's intentional, they're
@@ -75,8 +79,10 @@ supabase_setup.sql   run once in Supabase SQL Editor — profiles/credits schema
 api/research.js      Stage 1 — multi-source company research
 api/generate.js      Stage 2 — two-step outline + content generation
 api/parse-resume.js  résumé → structured Brief fields
-api/checkout.js       creates a Stripe Checkout session for a credit pack
-api/stripe-webhook.js verifies Stripe payment, credits the buyer's account
+api/checkout.js        creates a Razorpay order for a credit pack
+api/razorpay-verify.js verifies a payment client-side right after checkout (fast credit path)
+api/razorpay-webhook.js verifies + credits on payment.captured (reliable backstop)
+api/_razorpay.js        shared idempotent creditForPayment() used by both of the above
 api/_supabase.js       server-side Supabase client + bearer-token auth helper
 api/_gate.js           auth-required / credit-spend guards for the token-costing routes
 server.js              local dev server (Express) — not used on Vercel

@@ -6,15 +6,16 @@ import generateHandler, { outlineHandler } from "./api/generate.js";
 import researchHandler from "./api/research.js";
 import parseResumeHandler from "./api/parse-resume.js";
 import checkoutHandler from "./api/checkout.js";
-import stripeWebhookHandler from "./api/stripe-webhook.js";
+import razorpayVerifyHandler from "./api/razorpay-verify.js";
+import razorpayWebhookHandler from "./api/razorpay-webhook.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 5173;
 
-// Stripe needs the exact raw request bytes to verify its signature — mount this BEFORE the
+// Razorpay needs the exact raw request bytes to verify its signature — mount this BEFORE the
 // global JSON body parser below, so it never gets JSON-parsed first.
-app.post("/api/stripe-webhook", express.raw({ type: "*/*" }), stripeWebhookHandler);
+app.post("/api/razorpay-webhook", express.raw({ type: "*/*" }), razorpayWebhookHandler);
 
 app.use(express.json({ limit: "2mb" }));
 
@@ -34,8 +35,10 @@ app.post("/api/outline", outlineHandler);
 app.post("/api/generate", generateHandler);
 // Resume auto-fill for The Brief
 app.post("/api/parse-resume", parseResumeHandler);
-// Start a Stripe Checkout session for a credit pack (webhook route is mounted above)
+// Start a Razorpay order for a credit pack (webhook route is mounted above)
 app.post("/api/checkout", checkoutHandler);
+// Client-side payment verification — fast credit path right after the Razorpay modal succeeds
+app.post("/api/razorpay-verify", razorpayVerifyHandler);
 
 // Serve the static UI (code.html is the entry point)
 app.get("/", (_req, res) => {

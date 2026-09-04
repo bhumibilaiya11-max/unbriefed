@@ -295,43 +295,64 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
   signoutBtn.addEventListener("click", async () => { if (sb) await sb.auth.signOut(); });
 
   const PACK_LABELS = { small: "Small (3 credits)", medium: "Medium (10 credits)", large: "Large (20 credits)" };
+  const PACK_CREDITS = { small: 3, medium: 10, large: 20 };
   packBtns.forEach((btn) => {
     btn.addEventListener("click", async () => {
       if (!session) { flashAuthBanner(); return; }
+      if (!window.Razorpay) { authErrorEl.textContent = "Payment widget failed to load — refresh and try again."; return; }
       authErrorEl.textContent = "";
       btn.classList.add("busy");
       try {
         const res = await fetch("/api/checkout", { method: "POST", headers: authHeaders(), body: JSON.stringify({ pack: btn.dataset.pack }) });
         const d = await res.json().catch(() => ({}));
-        if (res.ok && d.url) { window.location.href = d.url; return; }
-        authErrorEl.textContent = d.error || `Could not start checkout for ${PACK_LABELS[btn.dataset.pack] || "that pack"}.`;
+        if (!res.ok || !d.orderId) {
+          authErrorEl.textContent = d.error || `Could not start checkout for ${PACK_LABELS[btn.dataset.pack] || "that pack"}.`;
+          btn.classList.remove("busy");
+          return;
+        }
+        const rzp = new window.Razorpay({
+          key: d.keyId,
+          amount: d.amount,
+          currency: d.currency,
+          order_id: d.orderId,
+          name: "Unbriefed",
+          description: d.label,
+          prefill: { email: d.email },
+          theme: { color: "#630ed4" },
+          modal: { ondismiss: () => btn.classList.remove("busy") },
+          handler: async (response) => {
+            authErrorEl.textContent = "Payment received — crediting your account…";
+            try {
+              const vr = await fetch("/api/razorpay-verify", {
+                method: "POST", headers: authHeaders(),
+                body: JSON.stringify({ ...response, credits: PACK_CREDITS[btn.dataset.pack] }),
+              });
+              const vd = await vr.json().catch(() => ({}));
+              if (vr.ok && vd.credited) {
+                authErrorEl.textContent = "";
+                await refreshCredits();
+              } else if (vr.ok) {
+                // Already credited by the webhook a moment earlier — still a success for the user.
+                authErrorEl.textContent = "";
+                await refreshCredits();
+              } else {
+                authErrorEl.textContent = `Payment went through but crediting failed — contact support with payment id ${response.razorpay_payment_id}.`;
+              }
+            } catch {
+              authErrorEl.textContent = `Payment went through but we couldn't confirm the credit — contact support with payment id ${response.razorpay_payment_id}.`;
+            } finally {
+              btn.classList.remove("busy");
+            }
+          },
+        });
+        rzp.on("payment.failed", () => { authErrorEl.textContent = "Payment failed — no charge made. Try again."; btn.classList.remove("busy"); });
+        rzp.open();
       } catch {
         authErrorEl.textContent = "Could not reach the payment server — try again.";
-      } finally {
         btn.classList.remove("busy");
       }
     });
   });
-
-  // Returning from Stripe Checkout — confirm, clean the URL, and refresh the credit balance
-  // (the webhook usually lands within a second or two, so poll it briefly).
-  (function handleCheckoutReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const status = params.get("checkout");
-    if (!status) return;
-    history.replaceState({}, "", window.location.pathname);
-    if (status === "success") {
-      authErrorEl.textContent = "Payment received — crediting your account…";
-      let tries = 0;
-      const poll = setInterval(async () => {
-        await refreshCredits();
-        if (++tries >= 5) clearInterval(poll);
-      }, 1500);
-      setTimeout(() => { if (authErrorEl.textContent === "Payment received — crediting your account…") authErrorEl.textContent = ""; }, 8000);
-    } else if (status === "cancel") {
-      authErrorEl.textContent = "Checkout cancelled — no charge made.";
-    }
-  })();
 
   function saveBrief() {
     try {
