@@ -119,10 +119,9 @@
         .brutalist-input.invalid { border-color: #ba1a1a; background: #ffdad6; }
         .magnetic-btn {
             position: relative; overflow: hidden;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow .2s;
         }
-        .magnetic-btn:hover { transform: scale(1.02); }
-        .magnetic-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        .magnetic-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         @keyframes stamp-in {
             0% { transform: scale(1.08) translateY(-12px); opacity: 0; }
@@ -161,6 +160,64 @@
         }
         .stage-pill.active { opacity: 1; background: #630ed4; color: #fff; border-color: #630ed4; }
         .stage-pill.done { opacity: 1; background: #1c1b1b; color: #fff; }
+
+        /* ================= APP SHELL — brand texture & flourishes ================= */
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: #fcf9f8;
+            background-image: radial-gradient(rgba(28,27,27,.05) 1px, transparent 1px);
+            background-size: 22px 22px;
+        }
+        .brand-mark {
+            width: 30px; height: 30px; flex: none; border-radius: 9999px; border: 2px solid currentColor;
+            display: flex; align-items: center; justify-content: center; color: #630ed4;
+        }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 7px; border: 2px solid #1c1b1b; padding: 4px 10px;
+            font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+            width: fit-content; background: #fff;
+        }
+        .eyebrow .dot { width: 6px; height: 6px; border-radius: 9999px; background: #630ed4; flex: none; }
+        .hero-blob {
+            position: absolute; z-index: 0; top: -70px; right: -90px; width: 280px; height: 280px;
+            pointer-events: none; opacity: .12; border-radius: 58% 42% 55% 45% / 48% 58% 42% 52%;
+            background: radial-gradient(circle at 35% 30%, #630ed4, transparent 70%);
+        }
+        .magnetic-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #630ed4; }
+        .magnetic-btn::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
+            transform: translateX(-130%); transition: transform .6s ease;
+        }
+        .magnetic-btn:hover::after { transform: translateX(130%); }
+        .chip { position: relative; }
+        .chip.active::before {
+            content: ""; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px;
+            border-radius: 9999px; background: #fd761a;
+        }
+        .resume-drop-icon {
+            width: 46px; height: 46px; border-radius: 9999px; border: 2px solid #1c1b1b;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
+            transition: background .2s, transform .2s, color .2s;
+        }
+        #resume-drop:hover .resume-drop-icon { background: #630ed4; border-color: #630ed4; color: #fff; transform: scale(1.06) rotate(-4deg); }
+
+        /* empty-state "deck" illustration — three fanned cards, pure CSS */
+        .fan { position: relative; width: 168px; height: 108px; margin: 0 auto 4px; }
+        .fan-card {
+            position: absolute; inset: 0; border: 2px solid #1c1b1b; background: #fff; overflow: hidden;
+            box-shadow: 3px 3px 0 rgba(28,27,27,.12); transition: transform .25s ease;
+        }
+        .fan-card:nth-child(1) { transform: rotate(-9deg) translate(-16px, 4px); }
+        .fan-card:nth-child(2) { transform: rotate(0deg); z-index: 1; box-shadow: 4px 4px 0 #1c1b1b; }
+        .fan-card:nth-child(3) { transform: rotate(9deg) translate(16px, 4px); background: #630ed4; }
+        .fan-card:nth-child(3) .bar { background: #fff !important; opacity: .9; }
+        .fan-card:nth-child(3) .lines span { background: rgba(255,255,255,.4); }
+        #empty-state:hover .fan-card:nth-child(1) { transform: rotate(-13deg) translate(-22px, 2px); }
+        #empty-state:hover .fan-card:nth-child(3) { transform: rotate(13deg) translate(22px, 2px); }
+        .fan-card .bar { height: 9px; background: #9d4300; }
+        .fan-card .lines { padding: 10px 12px; }
+        .fan-card .lines span { display: block; height: 4px; background: #e5e2e1; margin-bottom: 7px; border-radius: 1px; }
 
         /* ================= SLIDE STAGE (fixed design size, scaled to fit) ================= */
         #stage-wrap { transform-origin: top left; }
@@ -408,20 +465,22 @@
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased overflow-x-hidden">
 <!-- TopNavBar -->
 <header class="bg-on-background text-primary font-headline-md text-headline-md flex justify-between items-center w-full px-grid-margin py-4 max-w-[1440px] mx-auto z-50 border-b-2 border-primary">
+<div class="flex items-center gap-3">
+<span class="brand-mark"><span class="material-symbols-outlined text-lg">bolt</span></span>
 <div class="font-display-lg text-headline-md uppercase tracking-tighter text-on-primary">Unbriefed</div>
-<nav class="hidden md:flex gap-8 items-center">
-<button class="text-primary-container font-bold border-b-2 border-primary-container pb-1 font-label-md text-label-md" id="nav-generator" type="button">Generator</button>
-</nav>
-<button class="hidden md:block bg-primary text-on-primary px-6 py-2 brutalist-border font-label-md text-label-md hover:bg-primary-container transition-colors" id="nav-cta">Create Pitch</button>
+</div>
+<button class="hidden md:flex items-center gap-2 bg-primary text-on-primary px-6 py-2 brutalist-border font-label-md text-label-md hover:bg-primary-container transition-colors" id="nav-cta"><span class="material-symbols-outlined text-base">edit_document</span>Create Pitch</button>
 <button class="md:hidden text-on-primary" id="nav-cta-mobile" type="button"><span class="material-symbols-outlined">bolt</span></button>
 </header>
 
 <main class="flex-1 max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row border-l-2 border-r-2 border-on-background relative">
 <!-- ================= LEFT: THE BRIEF ================= -->
-<section class="w-full lg:w-5/12 p-section-padding border-b-2 lg:border-b-0 lg:border-r-2 border-on-background flex flex-col gap-6 bg-surface z-10">
-<div>
+<section class="w-full lg:w-5/12 p-section-padding border-b-2 lg:border-b-0 lg:border-r-2 border-on-background flex flex-col gap-6 bg-surface z-10 relative overflow-hidden">
+<div class="hero-blob" aria-hidden="true"></div>
+<div class="relative z-10">
+<span class="eyebrow mb-3"><span class="dot"></span>Stage 01 · The Input</span>
 <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">The Brief</h1>
-<p class="font-body-md text-body-md text-on-surface-variant">Every parameter below changes the argument, not just the styling.</p>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
 </div>
 
 <!-- Résumé auto-fill -->
@@ -429,7 +488,7 @@
 <label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills the profile)</label>
 <div class="brutalist-border border-dashed mt-1 p-4 text-center cursor-pointer hover:bg-surface-container transition-colors" id="resume-drop">
 <input accept=".pdf,.txt,.md,.markdown" class="hidden" id="resume-file" type="file"/>
-<span class="material-symbols-outlined text-3xl opacity-60">upload_file</span>
+<span class="resume-drop-icon"><span class="material-symbols-outlined">upload_file</span></span>
 <p class="font-body-md text-sm">Drop a PDF / TXT résumé here, or click to choose</p>
 <p class="font-label-md text-xs text-on-surface-variant mt-1" id="resume-status">No file loaded.</p>
 </div>
@@ -487,7 +546,7 @@
 </div>
 </fieldset>
 
-<div class="flex flex-col gap-tight-gap" id="access-code-wrap" hidden>
+<div class="hidden flex-col gap-tight-gap" id="access-code-wrap">
 <label class="font-label-md text-label-md uppercase" for="access-code">Access Code</label>
 <input class="brutalist-input w-full p-2 font-body-md text-sm" id="access-code" type="password" placeholder="Ask the deck owner for this hosted demo's code" autocomplete="off"/>
 </div>
@@ -502,7 +561,8 @@
 <section class="w-full lg:w-7/12 bg-surface-container-low p-grid-margin lg:p-section-padding flex flex-col relative overflow-hidden scroll-mt-4" id="deck-viewer">
 <div class="flex justify-between items-start mb-4 gap-4">
 <div>
-<h2 class="font-headline-md text-headline-md">Deck Viewer</h2>
+<span class="eyebrow mb-2"><span class="dot" style="background:#fd761a"></span>Stage 02 · The Output</span>
+<h2 class="font-headline-md text-headline-md mt-2">Deck Viewer</h2>
 <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" id="viewer-status">Awaiting Generation</p>
 </div>
 <button class="hidden items-center gap-2 border-2 border-on-background px-4 py-2 font-label-md text-label-md hover:bg-on-background hover:text-on-primary transition-colors" id="download-btn">
@@ -546,9 +606,13 @@
 
 <!-- slide canvas -->
 <div class="relative w-full aspect-[16/9] bg-white brutalist-border shadow-[6px_6px_0px_#1c1b1b] overflow-hidden" id="slide-canvas">
-<div class="absolute inset-0 text-center flex flex-col items-center justify-center gap-4 text-on-surface-variant p-8" id="empty-state">
-<span class="material-symbols-outlined text-6xl opacity-50">analytics</span>
-<p class="font-body-lg text-body-lg max-w-md">Fill in The Brief. Unbriefed researches the company first, then writes an eight-slide case tailored to the role and tone.</p>
+<div class="absolute inset-0 text-center flex flex-col items-center justify-center gap-5 text-on-surface-variant p-8" id="empty-state">
+<div class="fan" aria-hidden="true">
+<div class="fan-card"><div class="bar" style="background:#9d4300"></div><div class="lines"><span style="width:70%"></span><span style="width:45%"></span></div></div>
+<div class="fan-card"><div class="bar"></div><div class="lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:35%"></span></div></div>
+<div class="fan-card"><div class="bar" style="background:#fd761a"></div><div class="lines"><span style="width:60%"></span><span style="width:40%"></span></div></div>
+</div>
+<p class="font-body-lg text-body-lg max-w-md">Fill in The Brief. Unbriefed researches the company first, then decides the deck's own shape and writes a case tailored to the role and tone.</p>
 </div>
 <div class="absolute top-0 left-0 hidden" id="stage-wrap"><div class="slide-stage" id="slide-stage"></div></div>
 <div class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex-col items-center justify-center hidden" id="loading-overlay" style="display:none;">
@@ -571,14 +635,14 @@
 </main>
 
 <footer class="bg-on-background text-on-primary font-label-md text-label-md uppercase w-full py-8 px-grid-margin flex flex-col md:flex-row justify-between items-center gap-tight-gap z-50 border-t-2 border-primary">
-<div class="font-display-lg text-on-primary mb-4 md:mb-0">Unbriefed</div>
-<div class="text-primary-container text-center md:text-left mb-4 md:mb-0">© 2024 Unbriefed Strategic Labs. Confidential Consulting Framework.</div>
-<div class="flex gap-6 flex-wrap justify-center">
-<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Privacy Policy</a>
-<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Terms of Service</a>
-<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Framework Documentation</a>
-<a class="text-on-primary opacity-60 hover:text-primary transition-colors" href="#">Contact Analyst</a>
+<div class="flex items-center gap-3 mb-4 md:mb-0">
+<span class="brand-mark"><span class="material-symbols-outlined text-lg">bolt</span></span>
+<span class="font-display-lg text-on-primary">Unbriefed</span>
 </div>
+<div class="text-primary-container text-center md:text-left mb-4 md:mb-0 normal-case tracking-normal font-body-md text-sm opacity-80">Research-grounded, two-step AI pitch decks — the shape and the voice both change with the ask.</div>
+<a class="text-on-primary opacity-70 hover:opacity-100 hover:text-primary transition-colors flex items-center gap-2" href="https://github.com/bhumibilaiya11-max/unbriefed" target="_blank" rel="noopener">
+<span class="material-symbols-outlined text-base">code</span>Source
+        </a>
 </footer>
 
 <!-- offscreen full-size stage used only for PDF rasterisation -->
