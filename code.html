@@ -169,10 +169,11 @@
             background-size: 22px 22px;
         }
         .brand-mark {
-            width: 30px; height: 30px; flex: none; border-radius: 8px; border: 2px solid currentColor;
-            display: flex; align-items: center; justify-content: center; color: #630ed4;
-            transform: rotate(-8deg); box-shadow: 2px 2px 0 currentColor;
+            width: 30px; height: 30px; flex: none; border-radius: 8px; border: 2px solid #1c1b1b;
+            display: flex; align-items: center; justify-content: center; color: #630ed4; background: #fff;
+            transform: rotate(-8deg); box-shadow: 2px 2px 0 #1c1b1b;
         }
+        .brand-glyph { display: block; }
         .eyebrow {
             display: inline-flex; align-items: center; gap: 7px; border: 2px solid #1c1b1b; padding: 4px 10px;
             font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -202,9 +203,9 @@
             background: radial-gradient(circle at 60% 60%, #fd761a, transparent 70%);
         }
         .brand-mark-hero {
-            width: 48px; height: 48px; flex: none; border-radius: 11px; border: 2.5px solid #1c1b1b;
+            width: 50px; height: 50px; flex: none; border-radius: 12px; border: 2.5px solid #1c1b1b;
             display: flex; align-items: center; justify-content: center; color: #630ed4; background: #fff;
-            box-shadow: 3px 3px 0 #1c1b1b; transform: rotate(-6deg); font-size: 24px;
+            box-shadow: 3px 3px 0 #1c1b1b; transform: rotate(-6deg);
         }
         .grain-overlay {
             position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .05; mix-blend-mode: multiply;
@@ -216,19 +217,8 @@
         }
         .glow-btn { box-shadow: 5px 5px 0 #630ed4; }
         .glow-btn:hover { box-shadow: 7px 7px 0 #fd761a; }
-        .float-chip {
-            position: absolute; z-index: 4; background: #fff; border: 2px solid #1c1b1b; box-shadow: 3px 3px 0 #1c1b1b;
-            padding: 8px 12px; font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
-            border-radius: 10px; white-space: nowrap; animation: chip-float 5s ease-in-out infinite;
-        }
-        .float-chip b { color: #630ed4; }
-        .float-chip-a { top: 8%; left: 2%; transform: rotate(-7deg); animation-delay: 0s; }
-        .float-chip-b { bottom: 10%; right: 2%; transform: rotate(6deg); animation-delay: .8s; }
-        .float-chip-c { top: 14%; right: 4%; transform: rotate(4deg); animation-delay: 1.6s; }
-        @keyframes chip-float {
-            0%, 100% { translate: 0 0; }
-            50% { translate: 0 -9px; }
-        }
+        .hero-sub { font-family: 'Epilogue', sans-serif; font-weight: 700; }
+        .hero-sub .accent { color: #fd761a; }
         .marquee { overflow: hidden; white-space: nowrap; position: relative; z-index: 2; }
         .marquee-track {
             display: inline-flex; align-items: center; gap: 16px; padding: 11px 0;
@@ -519,7 +509,7 @@
 <!-- TopNavBar -->
 <header class="bg-on-background text-primary font-headline-md text-headline-md flex justify-between items-center w-full px-grid-margin py-4 max-w-[1440px] mx-auto z-50 border-b-2 border-primary">
 <div class="flex items-center gap-3">
-<span class="brand-mark"><span class="material-symbols-outlined text-lg">bolt</span></span>
+<span class="brand-mark"><svg class="brand-glyph" width="17" height="17" viewBox="0 0 36 36" aria-hidden="true"><path d="M11 13V22A7 7 0 0 0 25 22V7" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg></span>
 <div class="font-display-lg text-headline-md uppercase tracking-tighter text-on-primary">Unbriefed</div>
 </div>
 <button class="hidden md:flex items-center gap-2 bg-primary text-on-primary px-6 py-2 brutalist-border font-label-md text-label-md hover:bg-primary-container transition-colors" id="nav-cta"><span class="material-symbols-outlined text-base">edit_document</span>Create Pitch</button>
@@ -531,13 +521,10 @@
 <div class="grain-overlay" aria-hidden="true"></div>
 <div class="hero-blob-lg hero-blob-lg-a" aria-hidden="true"></div>
 <div class="hero-blob-lg hero-blob-lg-b" aria-hidden="true"></div>
-<div class="float-chip float-chip-a hidden lg:block" aria-hidden="true">📈 <b>0 → 12,000</b> subs in 8mo</div>
-<div class="float-chip float-chip-b hidden lg:block" aria-hidden="true">🎯 <b>−34%</b> CAC in 3 months</div>
-<div class="float-chip float-chip-c hidden lg:block" aria-hidden="true">✦ 8 tones, 0 templates</div>
 <div class="max-w-[820px] mx-auto relative z-10 flex flex-col items-center text-center gap-4">
-<span class="brand-mark-hero"><span class="material-symbols-outlined">bolt</span></span>
+<span class="brand-mark-hero"><svg class="brand-glyph" width="28" height="28" viewBox="0 0 36 36" aria-hidden="true"><path d="M11 13V22A7 7 0 0 0 25 22V7" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg></span>
 <h1 class="font-headline-lg leading-[0.98] tracking-tight text-[40px] md:text-[72px] font-bold max-w-2xl">Don't send a résumé.<br/>Send <span class="grad-text">a case.</span></h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Unbriefed researches the company, decides the deck's own shape, and writes the pitch in your tone — never a template's.</p>
+<p class="hero-sub text-[19px] md:text-[22px] tracking-tight">Their gap. <span class="accent">Your edge.</span></p>
 <button class="magnetic-btn glow-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-8 py-4 brutalist-border font-headline-md text-headline-md hover:bg-inverse-surface transition-colors mt-2" id="hero-cta" type="button">
 Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 </button>
@@ -721,7 +708,7 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 
 <footer class="bg-on-background text-on-primary font-label-md text-label-md uppercase w-full py-8 px-grid-margin flex flex-col md:flex-row justify-between items-center gap-tight-gap z-50 border-t-2 border-primary">
 <div class="flex items-center gap-3 mb-4 md:mb-0">
-<span class="brand-mark"><span class="material-symbols-outlined text-lg">bolt</span></span>
+<span class="brand-mark"><svg class="brand-glyph" width="17" height="17" viewBox="0 0 36 36" aria-hidden="true"><path d="M11 13V22A7 7 0 0 0 25 22V7" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg></span>
 <span class="font-display-lg text-on-primary">Unbriefed</span>
 </div>
 <div class="text-primary-container text-center md:text-left mb-4 md:mb-0 normal-case tracking-normal font-body-md text-sm opacity-80">Research-grounded, two-step AI pitch decks — the shape and the voice both change with the ask.</div>
