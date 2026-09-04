@@ -75,8 +75,15 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
   const outlinePanel = $("outline-panel");
   const outlineBadge = $("outline-badge");
   const outlineBody = $("outline-body");
-  const accessCodeWrap = $("access-code-wrap");
-  const accessCodeEl = $("access-code");
+  const authBanner = $("auth-banner");
+  const authSignedOut = $("auth-signed-out");
+  const authSignedIn = $("auth-signed-in");
+  const googleSigninBtn = $("google-signin-btn");
+  const signoutBtn = $("signout-btn");
+  const authEmailEl = $("auth-email");
+  const creditsPillEl = $("credits-pill");
+  const authErrorEl = $("auth-error");
+  const packBtns = Array.from(document.querySelectorAll(".pack-btn"));
   const resumeDrop = $("resume-drop");
   const resumeFile = $("resume-file");
   const resumeStatus = $("resume-status");
@@ -178,7 +185,7 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
     }
   }
 
-  // Extracted text is cached here whenever a parse attempt is blocked by the access-code gate,
+  // Extracted text is cached here whenever a parse attempt is blocked by the sign-in gate,
   // so entering the code retries the SAME résumé automatically — no re-upload needed.
   let pendingResumeText = null;
 
@@ -189,8 +196,8 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
     });
     if (res.status === 401) {
       pendingResumeText = text;
-      showAccessCodeNeeded();
-      resumeStatus.textContent = "This hosted demo needs an access code — enter it above, then this résumé retries automatically.";
+      flashAuthBanner();
+      resumeStatus.textContent = "Sign in with Google above — this résumé retries automatically once you do.";
       return;
     }
     pendingResumeText = null;
@@ -219,37 +226,100 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
   // ------------------------------------------------------------------ persistence
   const BRIEF_KEY = "unbriefed.brief.v2";
   const DECK_KEY = "unbriefed.lastdeck.v2";
-  const CODE_KEY = "unbriefed.accesscode";
 
-  // Only the hosted deploy sets ACCESS_CODE server-side; local dev never needs this.
+  // ------------------------------------------------------------------ auth + credits
+  // Public by design — RLS on the `profiles` table (not this key) is what actually protects data.
+  const SUPABASE_URL = "https://akjnaqvamtgyyobicpma.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFram5hcXZhbXRneXlvYmljcG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1NDQzMDMsImV4cCI6MjEwNDEyMDMwM30.th9zqrGXRp63FerJGfLrr6bpVUDulKh2IAL60Iu1LMU";
+  const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+  let session = null;
+
   function authHeaders() {
     const h = { "Content-Type": "application/json" };
-    const code = (accessCodeEl.value || "").trim();
-    if (code) h["x-access-code"] = code;
+    if (session?.access_token) h["Authorization"] = `Bearer ${session.access_token}`;
     return h;
   }
-  // The Access Code field is always visible now (asked up front) — this just draws attention to it.
-  function showAccessCodeNeeded() {
-    accessCodeWrap.classList.add("access-code-flash");
-    accessCodeEl.focus();
-    setTimeout(() => accessCodeWrap.classList.remove("access-code-flash"), 1600);
+  // Draws attention to the sign-in / buy-credits banner (401 or 402 from any API call lands here).
+  function flashAuthBanner() {
+    authBanner.classList.add("brief-banner-flash");
+    authBanner.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => authBanner.classList.remove("brief-banner-flash"), 1600);
   }
-  accessCodeEl.addEventListener("input", () => {
-    try { localStorage.setItem(CODE_KEY, accessCodeEl.value.trim()); } catch {}
-  });
-  // If a résumé upload was blocked on a missing/wrong code, retry it automatically once a code
-  // is entered — the user shouldn't have to re-upload the same file.
-  accessCodeEl.addEventListener("change", () => {
-    if (pendingResumeText && accessCodeEl.value.trim()) {
-      const text = pendingResumeText;
-      pendingResumeText = null;
-      submitResumeText(text);
+  async function refreshCredits() {
+    if (!sb || !session) return;
+    const { data, error } = await sb.from("profiles").select("credits").eq("id", session.user.id).single();
+    if (!error && data) creditsPillEl.textContent = `${data.credits} credit${data.credits === 1 ? "" : "s"}`;
+  }
+  async function updateAuthUI() {
+    if (session) {
+      authSignedOut.classList.add("hidden"); authSignedOut.classList.remove("flex");
+      authSignedIn.classList.remove("hidden"); authSignedIn.classList.add("flex");
+      authEmailEl.textContent = session.user.email || "your Google account";
+      await refreshCredits();
+      // A résumé upload blocked on being signed out retries automatically now that we're in.
+      if (pendingResumeText) {
+        const text = pendingResumeText;
+        pendingResumeText = null;
+        submitResumeText(text).catch((err) => {
+          console.error("[Unbriefed] auto-retry of pending résumé failed", err);
+          resumeStatus.textContent = "Something went wrong retrying that résumé — try uploading it again.";
+        });
+      }
+    } else {
+      authSignedIn.classList.add("hidden"); authSignedIn.classList.remove("flex");
+      authSignedOut.classList.remove("hidden"); authSignedOut.classList.add("flex");
     }
+  }
+  if (sb) {
+    sb.auth.getSession().then(({ data }) => { session = data.session; updateAuthUI(); });
+    sb.auth.onAuthStateChange((_event, newSession) => { session = newSession; updateAuthUI(); });
+  }
+  googleSigninBtn.addEventListener("click", () => {
+    if (!sb) { authErrorEl.textContent = "Sign-in failed to load — refresh the page and try again."; return; }
+    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + window.location.pathname } });
   });
-  try {
-    const savedCode = localStorage.getItem(CODE_KEY);
-    if (savedCode) accessCodeEl.value = savedCode;
-  } catch {}
+  signoutBtn.addEventListener("click", async () => { if (sb) await sb.auth.signOut(); });
+
+  const PACK_LABELS = { small: "Small (3 credits)", medium: "Medium (10 credits)", large: "Large (20 credits)" };
+  packBtns.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!session) { flashAuthBanner(); return; }
+      authErrorEl.textContent = "";
+      btn.classList.add("busy");
+      try {
+        const res = await fetch("/api/checkout", { method: "POST", headers: authHeaders(), body: JSON.stringify({ pack: btn.dataset.pack }) });
+        const d = await res.json().catch(() => ({}));
+        if (res.ok && d.url) { window.location.href = d.url; return; }
+        authErrorEl.textContent = d.error || `Could not start checkout for ${PACK_LABELS[btn.dataset.pack] || "that pack"}.`;
+      } catch {
+        authErrorEl.textContent = "Could not reach the payment server — try again.";
+      } finally {
+        btn.classList.remove("busy");
+      }
+    });
+  });
+
+  // Returning from Stripe Checkout — confirm, clean the URL, and refresh the credit balance
+  // (the webhook usually lands within a second or two, so poll it briefly).
+  (function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("checkout");
+    if (!status) return;
+    history.replaceState({}, "", window.location.pathname);
+    if (status === "success") {
+      authErrorEl.textContent = "Payment received — crediting your account…";
+      let tries = 0;
+      const poll = setInterval(async () => {
+        await refreshCredits();
+        if (++tries >= 5) clearInterval(poll);
+      }, 1500);
+      setTimeout(() => { if (authErrorEl.textContent === "Payment received — crediting your account…") authErrorEl.textContent = ""; }, 8000);
+    } else if (status === "cancel") {
+      authErrorEl.textContent = "Checkout cancelled — no charge made.";
+    }
+  })();
+
   function saveBrief() {
     try {
       localStorage.setItem(BRIEF_KEY, JSON.stringify({
@@ -460,8 +530,12 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
       method: "POST", headers: authHeaders(), body: JSON.stringify(payload),
     });
     if (r.status === 401) {
-      showAccessCodeNeeded();
-      throw new Error("This hosted demo needs an access code — enter it in the Access Code field and click Build again.");
+      flashAuthBanner();
+      throw new Error("Sign in with Google above, then click Build again.");
+    }
+    if (r.status === 402) {
+      flashAuthBanner();
+      throw new Error("You're out of credits — buy more above, then click Build again.");
     }
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || "generate " + r.status);

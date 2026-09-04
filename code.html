@@ -108,6 +108,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.12.2/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
         /* ---- Existing brutalist / editorial system ---- */
         .brutalist-border { border: 2px solid #1c1b1b; }
@@ -148,16 +149,29 @@
         }
         .chip:hover { background: #e5e2e1; }
         .chip.active { background: #1c1b1b; color: #fff; }
-        .access-code-banner {
+        .brief-banner {
             border: 2px solid #1c1b1b; padding: 14px 16px; background: #fff7ed;
             box-shadow: 3px 3px 0 #1c1b1b; transition: box-shadow .2s, background .2s;
         }
-        .access-code-banner.access-code-flash { background: #ffe8d1; box-shadow: 3px 3px 0 #fd761a; animation: flash-pulse 1.6s ease; }
+        .brief-banner.brief-banner-flash { background: #ffe8d1; box-shadow: 3px 3px 0 #fd761a; animation: flash-pulse 1.6s ease; }
         @keyframes flash-pulse {
             0%, 100% { transform: translate(0, 0); }
             15%, 45% { transform: translate(-2px, -2px); }
             30%, 60% { transform: translate(0, 0); }
         }
+        .credits-pill {
+            display: inline-flex; align-items: center; gap: 4px; border: 2px solid #1c1b1b; background: #fff;
+            padding: 4px 10px; font-family: 'Geist', sans-serif; font-weight: 700; font-size: 12px; text-transform: uppercase;
+        }
+        .pack-btn {
+            border: 2px solid #1c1b1b; background: #fff; padding: 10px 12px; display: flex; flex-direction: column;
+            align-items: center; gap: 2px; cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s;
+        }
+        .pack-btn:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 #630ed4; background: #fff7ed; }
+        .pack-btn.busy { opacity: .55; pointer-events: none; }
+        .pack-btn .pack-name { font-family: 'Geist', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #4a4455; }
+        .pack-btn .pack-price { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 20px; }
+        .pack-btn .pack-credits { font-size: 11px; color: #4a4455; }
         fieldset.brief-group { border: 2px solid #1c1b1b; padding: 16px; }
         fieldset.brief-group > legend {
             font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
@@ -560,12 +574,40 @@ Start Your Brief<span class="material-symbols-outlined">arrow_downward</span>
 <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
 </div>
 
-<!-- Access code — asked up front so it's never a surprise mid-upload -->
-<div class="access-code-banner flex flex-col sm:flex-row sm:items-end gap-3" id="access-code-wrap">
-<div class="flex-1 flex flex-col gap-tight-gap">
-<label class="font-label-md text-label-md uppercase" for="access-code"><span class="material-symbols-outlined text-sm align-middle mr-1">lock</span>Access Code (shared demo)</label>
-<input class="brutalist-input w-full p-3 font-body-md text-sm" id="access-code" type="password" placeholder="Enter the code you were given before uploading or generating" autocomplete="off"/>
+<!-- Auth + credits — asked up front, before any upload/generate attempt -->
+<div class="brief-banner flex flex-col gap-3" id="auth-banner">
+
+<!-- Signed OUT -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-3" id="auth-signed-out">
+<div class="flex-1">
+<p class="font-label-md text-label-md uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">bolt</span>Sign in to generate</p>
+<p class="font-body-md text-xs text-on-surface-variant mt-1">Google sign-in gets you 3 free generations — no card required.</p>
 </div>
+<button class="magnetic-btn flex items-center justify-center gap-2 bg-on-background text-on-primary px-5 py-2.5 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors whitespace-nowrap" id="google-signin-btn" type="button">
+<span class="material-symbols-outlined text-base">login</span>Sign in with Google
+</button>
+</div>
+
+<!-- Signed IN -->
+<div class="hidden flex-col gap-3" id="auth-signed-in">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<p class="font-body-md text-sm">Signed in as <span class="font-bold" id="auth-email"></span></p>
+<div class="flex items-center gap-3">
+<span class="credits-pill" id="credits-pill">— credits</span>
+<button class="font-label-md text-label-md uppercase underline decoration-2 underline-offset-2 hover:text-primary transition-colors" id="signout-btn" type="button">Sign out</button>
+</div>
+</div>
+<div class="flex flex-col gap-tight-gap">
+<p class="font-label-md text-xs text-on-surface-variant uppercase">Buy more credits</p>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<button class="pack-btn" data-pack="small" type="button"><span class="pack-name">Small</span><span class="pack-price">$2.99</span><span class="pack-credits">3 credits</span></button>
+<button class="pack-btn" data-pack="medium" type="button"><span class="pack-name">Medium</span><span class="pack-price">$7.99</span><span class="pack-credits">10 credits</span></button>
+<button class="pack-btn" data-pack="large" type="button"><span class="pack-name">Large</span><span class="pack-price">$12.99</span><span class="pack-credits">20 credits</span></button>
+</div>
+</div>
+</div>
+
+<p class="field-error" id="auth-error"></p>
 </div>
 
 <!-- Strategic Tone (8) — applies to the whole case, sits above the split -->

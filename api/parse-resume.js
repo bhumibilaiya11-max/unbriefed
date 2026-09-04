@@ -2,7 +2,7 @@
 // posts it here; Groq structures it into the Brief's fields. Achievements are pulled out as
 // discrete lines so they can later be reproduced verbatim on the evidence slide.
 
-import { checkAccess } from "./_gate.js";
+import { requireAuth } from "./_gate.js";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -76,7 +76,7 @@ export async function parseResume(text) {
 }
 
 export default async function handler(req, res) {
-  if (!checkAccess(req, res)) return;
+  if (!(await requireAuth(req, res))) return;
   try {
     const data = await parseResume(req.body?.text || "");
     console.log(

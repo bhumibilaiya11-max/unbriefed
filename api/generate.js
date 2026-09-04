@@ -6,7 +6,7 @@
 // There is no fixed slide template. Tone is injected into the Step-B system prompt and shapes the
 // actual sentence construction, not just the CSS.
 
-import { checkAccess } from "./_gate.js";
+import { requireAuth, requireCreditsAndSpend, refundCredit } from "./_gate.js";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -787,7 +787,8 @@ function offlineDeck(input) {
 
 // ---------------------------------------------------------------- HTTP
 export default async function handler(req, res) {
-  if (!checkAccess(req, res)) return;
+  const user = await requireCreditsAndSpend(req, res);
+  if (!user) return;
   try {
     const { company, context, role, tone, profile, research } = req.body || {};
     if (!company || company.toString().trim().length < 2)
@@ -800,16 +801,20 @@ export default async function handler(req, res) {
       profile: profile || {},
       research: research || null,
     });
+    // A Groq outage/rate-limit falls back to an offline placeholder rather than throwing —
+    // don't charge a real credit for that.
+    if (deck.offline) await refundCredit(user.id);
     res.status(200).json(deck);
   } catch (err) {
     console.error("[/api/generate]", err);
+    await refundCredit(user.id);
     res.status(err.status || 500).json({ error: err.message || "Generation failed" });
   }
 }
 
 // Optional standalone outline endpoint (Step A only) — handy for previewing deck shape.
 export async function outlineHandler(req, res) {
-  if (!checkAccess(req, res)) return;
+  if (!(await requireAuth(req, res))) return;
   try {
     const { company, context, role, tone, profile, research } = req.body || {};
     if (!company || company.toString().trim().length < 2)

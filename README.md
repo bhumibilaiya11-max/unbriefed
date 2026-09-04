@@ -41,28 +41,44 @@ Vercel picks up as serverless functions with zero config. `vercel.json` just rou
 vercel          # first deploy, follow the prompts
 vercel env add GROQ_API_KEY production
 vercel env add GROQ_MODEL production
-vercel env add ACCESS_CODE production   # optional but recommended — see below
+vercel env add SUPABASE_URL production
+vercel env add SUPABASE_SERVICE_ROLE_KEY production
+vercel env add STRIPE_SECRET_KEY production
+vercel env add STRIPE_WEBHOOK_SECRET production
 vercel --prod
 ```
 
-### Protecting a public deploy
+### Auth + credits (protecting a public deploy)
 
-The generation routes cost real Groq tokens on every call. Set `ACCESS_CODE` in the deploy's
-environment variables and the app requires that code (entered in the "Access Code" field, which
-appears automatically once a request is gated) before it will generate anything. Leave it unset
-for a fully open demo, or unset entirely for local dev.
+The generation routes cost real Groq tokens on every call, so they sit behind Google sign-in
+(Supabase Auth) and a per-user credit balance instead of a shared secret:
+
+- New sign-ups get 3 free credits (`supabase_setup.sql` — a Postgres trigger on `auth.users`).
+- `/api/generate` spends one credit atomically (`spend_credit()` in Postgres) and refunds it if
+  the call falls back to the offline placeholder (Groq outage / rate limit).
+- `/api/parse-resume` and `/api/outline` just require sign-in, no credit cost.
+- More credits are bought via Stripe Checkout (`api/checkout.js`); `api/stripe-webhook.js`
+  verifies the payment and credits the account (`add_credits()`), idempotently.
+
+Run `supabase_setup.sql` once in the Supabase project's SQL Editor before any of this works.
+`SUPABASE_URL` / `SUPABASE_ANON_KEY` are also hardcoded in `app.js` — that's intentional, they're
+public by design; Row Level Security on `profiles` is what actually protects data.
 
 ## Project layout
 
 ```
-code.html          the app shell (design tokens, layout, styles)
-app.js             browser logic — validation, orchestration, rendering, PDF export
-render.js          slide → HTML (shared by the browser and _shots.mjs)
-validate.js        shared input validation (gibberish / placeholder detection)
-api/research.js    Stage 1 — multi-source company research
-api/generate.js    Stage 2 — two-step outline + content generation
+code.html            the app shell (design tokens, layout, styles)
+app.js               browser logic — auth/credits, validation, orchestration, rendering, PDF export
+render.js            slide → HTML (shared by the browser and _shots.mjs)
+validate.js          shared input validation (gibberish / placeholder detection)
+supabase_setup.sql   run once in Supabase SQL Editor — profiles/credits schema + RPCs
+api/research.js      Stage 1 — multi-source company research
+api/generate.js      Stage 2 — two-step outline + content generation
 api/parse-resume.js  résumé → structured Brief fields
-api/_gate.js        shared access-code check for the token-costing routes
-server.js           local dev server (Express) — not used on Vercel
-_shots.mjs           Node script that screenshots a deck via a local Chrome + puppeteer-core
+api/checkout.js       creates a Stripe Checkout session for a credit pack
+api/stripe-webhook.js verifies Stripe payment, credits the buyer's account
+api/_supabase.js       server-side Supabase client + bearer-token auth helper
+api/_gate.js           auth-required / credit-spend guards for the token-costing routes
+server.js              local dev server (Express) — not used on Vercel
+_shots.mjs             Node script that screenshots a deck via a local Chrome + puppeteer-core
 ```
