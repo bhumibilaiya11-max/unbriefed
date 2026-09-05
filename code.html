@@ -185,6 +185,19 @@
         }
         .feature-title { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 16px; }
         .feature-desc { font-size: 13px; line-height: 1.5; color: #4a4455; }
+        .wizard-steps { display: flex; align-items: flex-start; width: 100%; max-width: 42rem; margin: 0 auto 4px; }
+        .wizard-step-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
+        .wizard-step-dot {
+            width: 34px; height: 34px; border-radius: 9999px; border: 2px solid #1c1b1b; background: #fff;
+            font-family: 'Geist', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s, transform .15s;
+        }
+        .wizard-step-dot:hover { transform: translate(-1px, -1px); }
+        .wizard-step-dot.active { background: #1c1b1b; color: #fff; }
+        .wizard-step-dot.done { background: #630ed4; border-color: #630ed4; color: #fff; }
+        .wizard-step-caption { font-family: 'Geist', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #4a4455; white-space: nowrap; }
+        .wizard-step-line { flex: 1; height: 2px; background: #1c1b1b; opacity: .2; margin: 17px 8px 0; }
+        .wizard-step-line.done { opacity: 1; background: #630ed4; }
         fieldset.brief-group { border: 2px solid #1c1b1b; padding: 16px; }
         fieldset.brief-group > legend {
             font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 700;
@@ -666,17 +679,17 @@ Continue to Your Brief<span class="material-symbols-outlined text-base">arrow_do
 <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every parameter below changes the argument the AI makes — not just the colours it's painted in.</p>
 </div>
 
-<!-- Strategic Tone (8) — applies to the whole case, sits above the split -->
-<div class="flex flex-col gap-tight-gap">
-<label class="font-label-md text-label-md uppercase">Strategic Tone</label>
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tone-toggle"></div>
-<p class="font-body-md text-xs text-on-surface-variant mt-1" id="tone-hint"></p>
+<!-- Guided wizard stepper -->
+<div class="wizard-steps" id="wizard-steps">
+<div class="wizard-step-wrap"><button class="wizard-step-dot" data-goto-step="1" type="button">1</button><span class="wizard-step-caption">Company</span></div>
+<div class="wizard-step-line" data-line="1"></div>
+<div class="wizard-step-wrap"><button class="wizard-step-dot" data-goto-step="2" type="button">2</button><span class="wizard-step-caption">You</span></div>
+<div class="wizard-step-line" data-line="2"></div>
+<div class="wizard-step-wrap"><button class="wizard-step-dot" data-goto-step="3" type="button">3</button><span class="wizard-step-caption">Tone &amp; Go</span></div>
 </div>
 
-<!-- ============ SPLIT: Company side | Candidate side ============ -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-<!-- Company side -->
+<!-- Step 1: The Company -->
+<div class="wizard-panel max-w-2xl mx-auto w-full flex flex-col gap-6" data-panel="1">
 <fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #630ed4">
 <legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">domain</span>The Company</legend>
 <div class="flex flex-col gap-tight-gap">
@@ -688,13 +701,18 @@ Continue to Your Brief<span class="material-symbols-outlined text-base">arrow_do
 <label class="font-label-md text-label-md uppercase">Target Role / Field</label>
 <div class="grid grid-cols-2 gap-2" id="role-group"></div>
 </div>
-<div class="flex flex-col gap-tight-gap flex-1">
+<div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="context-textarea">Operational Context / The Gap You're Arguing</label>
-<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none flex-1" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
+<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
 </div>
 </fieldset>
+<button class="magnetic-btn self-end inline-flex items-center gap-2 bg-on-background text-on-primary px-6 py-3 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors" data-wiz-next="2" type="button">
+Next: About You<span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
 
-<!-- Candidate side -->
+<!-- Step 2: You -->
+<div class="wizard-panel hidden max-w-2xl mx-auto w-full flex flex-col gap-6" data-panel="2">
 <fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #fd761a">
 <legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">person</span>You</legend>
 <div>
@@ -729,13 +747,33 @@ Continue to Your Brief<span class="material-symbols-outlined text-base">arrow_do
 <input class="brutalist-input w-full p-3 font-body-md text-body-md" id="cand-skills" type="text" placeholder="SQL, positioning, financial modelling, user research…"/>
 </div>
 </fieldset>
-
+<div class="flex justify-between items-center">
+<button class="inline-flex items-center gap-2 px-5 py-2.5 font-label-md text-label-md uppercase border-2 border-on-background hover:bg-surface-variant transition-colors" data-wiz-back="1" type="button">
+<span class="material-symbols-outlined text-base">arrow_back</span>Back
+</button>
+<button class="magnetic-btn inline-flex items-center gap-2 bg-on-background text-on-primary px-6 py-3 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors" data-wiz-next="3" type="button">
+Next: Pick Your Tone<span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
 </div>
 
+<!-- Step 3: Tone & Go -->
+<div class="wizard-panel hidden max-w-2xl mx-auto w-full flex flex-col gap-6" data-panel="3">
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase">Strategic Tone</label>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tone-toggle"></div>
+<p class="font-body-md text-xs text-on-surface-variant mt-1" id="tone-hint"></p>
+</div>
+<div class="flex justify-start">
+<button class="inline-flex items-center gap-2 px-5 py-2.5 font-label-md text-label-md uppercase border-2 border-on-background hover:bg-surface-variant transition-colors" data-wiz-back="2" type="button">
+<span class="material-symbols-outlined text-base">arrow_back</span>Back
+</button>
+</div>
 <button class="magnetic-btn w-full bg-on-background text-on-primary py-4 font-headline-md text-headline-md brutalist-border hover:bg-inverse-surface transition-colors flex justify-center items-center gap-2" id="generate-btn">
 <span class="material-symbols-outlined">bolt</span> Research + Build My Case
         </button>
 <p class="field-error text-center" id="global-error"></p>
+</div>
 </div>
 </section>
 

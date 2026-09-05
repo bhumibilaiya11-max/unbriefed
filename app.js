@@ -38,6 +38,7 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
 
   // ------------------------------------------------------------------ refs
   const $ = (id) => document.getElementById(id);
+  const briefSection = $("brief-section");
   const companyInput = $("company-input");
   const contextEl = $("context-textarea");
   const roleGroup = $("role-group");
@@ -440,12 +441,51 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
 
   // ------------------------------------------------------------------ orchestration
   generateBtn.addEventListener("click", build);
-  const scrollToBrief = () => companyInput.scrollIntoView({ behavior: "smooth", block: "center" });
+  const scrollToBrief = () => briefSection.scrollIntoView({ behavior: "smooth", block: "start" });
   // Before sign-in, "get started" means the landing gate; once signed in, it means the actual form.
   const scrollToStart = () => (session ? scrollToBrief() : authBanner.scrollIntoView({ behavior: "smooth", block: "center" }));
   [$("nav-cta"), $("nav-cta-mobile"), $("hero-cta")].forEach((btn) => btn && btn.addEventListener("click", scrollToStart));
   const continueToBriefBtn = $("continue-to-brief-btn");
   continueToBriefBtn && continueToBriefBtn.addEventListener("click", scrollToBrief);
+
+  // ------------------------------------------------------------------ guided wizard
+  // The Brief is walked one step at a time (Company -> You -> Tone & Go) instead of one long
+  // scroll with every field visible at once.
+  const wizardPanels = Array.from(document.querySelectorAll(".wizard-panel"));
+  const wizardDots = Array.from(document.querySelectorAll(".wizard-step-dot"));
+  const wizardLines = Array.from(document.querySelectorAll(".wizard-step-line"));
+  const wizardStepsEl = $("wizard-steps");
+  let wizardStep = 1;
+
+  function renderWizard() {
+    wizardPanels.forEach((p) => p.classList.toggle("hidden", parseInt(p.dataset.panel, 10) !== wizardStep));
+    wizardDots.forEach((d) => {
+      const n = parseInt(d.dataset.gotoStep, 10);
+      d.classList.toggle("active", n === wizardStep);
+      d.classList.toggle("done", n < wizardStep);
+    });
+    wizardLines.forEach((l) => l.classList.toggle("done", parseInt(l.dataset.line, 10) < wizardStep));
+  }
+  function goToWizardStep(n) {
+    wizardStep = Math.min(Math.max(n, 1), wizardPanels.length);
+    renderWizard();
+    wizardStepsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  wizardDots.forEach((d) => d.addEventListener("click", () => goToWizardStep(parseInt(d.dataset.gotoStep, 10))));
+  document.querySelectorAll("[data-wiz-back]").forEach((b) =>
+    b.addEventListener("click", () => goToWizardStep(parseInt(b.dataset.wizBack, 10)))
+  );
+  document.querySelectorAll("[data-wiz-next]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (wizardStep === 1) {
+        const cErr = validateCompany(companyInput.value.trim());
+        setInvalid(companyInput, companyError, cErr);
+        if (cErr) return; // stay put — the inline error under Target Entity explains why
+      }
+      goToWizardStep(parseInt(b.dataset.wizNext, 10));
+    })
+  );
+  renderWizard();
 
   async function build() {
     if (state.busy) return;
@@ -460,6 +500,7 @@ import { esc, escLines, clamp, accentFor, slideTemplate } from "./render.js";
         company: cErr || "ok", achievements: aErr || "ok", value: company,
       });
       globalError.textContent = "Fix the highlighted fields — nothing was sent to the AI.";
+      goToWizardStep(cErr ? 1 : 2); // jump back to whichever step actually has the problem
       return;
     }
 
