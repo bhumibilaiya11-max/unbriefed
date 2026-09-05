@@ -185,7 +185,7 @@
         }
         .feature-title { font-family: 'Epilogue', sans-serif; font-weight: 700; font-size: 16px; }
         .feature-desc { font-size: 13px; line-height: 1.5; color: #4a4455; }
-        .wizard-steps { display: flex; align-items: flex-start; width: 100%; max-width: 42rem; margin: 0 auto 4px; }
+        .wizard-steps { display: flex; align-items: flex-start; width: 100%; max-width: 56rem; margin: 0 auto 4px; }
         .wizard-step-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
         .wizard-step-dot {
             width: 34px; height: 34px; border-radius: 9999px; border: 2px solid #1c1b1b; background: #fff;
@@ -689,9 +689,11 @@ Continue to Your Brief<span class="material-symbols-outlined text-base">arrow_do
 </div>
 
 <!-- Step 1: The Company -->
-<div class="wizard-panel max-w-2xl mx-auto w-full flex flex-col gap-6" data-panel="1">
+<div class="wizard-panel max-w-4xl mx-auto w-full flex flex-col gap-6" data-panel="1">
 <fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #630ed4">
 <legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">domain</span>The Company</legend>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-4">
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="company-input">Target Entity</label>
 <input class="brutalist-input w-full p-3 font-body-lg text-body-lg" id="company-input" placeholder="e.g., Zomato, Notion, Aranya Beverages…" type="text"/>
@@ -701,9 +703,11 @@ Continue to Your Brief<span class="material-symbols-outlined text-base">arrow_do
 <label class="font-label-md text-label-md uppercase">Target Role / Field</label>
 <div class="grid grid-cols-2 gap-2" id="role-group"></div>
 </div>
+</div>
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="context-textarea">Operational Context / The Gap You're Arguing</label>
-<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
+<textarea class="brutalist-input w-full min-h-[220px] md:min-h-0 md:flex-1 p-3 font-body-md text-body-md resize-none" id="context-textarea" placeholder="The specific gap, opportunity, or mandate you want to build the case around…"></textarea>
+</div>
 </div>
 </fieldset>
 <button class="magnetic-btn self-end inline-flex items-center gap-2 bg-on-background text-on-primary px-6 py-3 brutalist-border font-label-md text-label-md hover:bg-inverse-surface transition-colors" data-wiz-next="2" type="button">
@@ -712,9 +716,11 @@ Next: About You<span class="material-symbols-outlined text-base">arrow_forward</
 </div>
 
 <!-- Step 2: You -->
-<div class="wizard-panel hidden max-w-2xl mx-auto w-full flex flex-col gap-6" data-panel="2">
+<div class="wizard-panel hidden max-w-4xl mx-auto w-full flex flex-col gap-6" data-panel="2">
 <fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #fd761a">
 <legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">person</span>You</legend>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-4">
 <div>
 <label class="font-label-md text-label-md uppercase">Résumé (optional — auto-fills below)</label>
 <div class="brutalist-border border-dashed mt-1 p-4 text-center cursor-pointer hover:bg-surface-container transition-colors" id="resume-drop">
@@ -730,21 +736,25 @@ Next: About You<span class="material-symbols-outlined text-base">arrow_forward</
 </div>
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="cand-education">Education / Background</label>
-<textarea class="brutalist-input w-full min-h-[64px] p-3 font-body-md text-body-md resize-none" id="cand-education" placeholder="Degrees, institutions, years, notable coursework"></textarea>
-</div>
-<div class="flex flex-col gap-tight-gap">
-<label class="font-label-md text-label-md uppercase" for="cand-experience">Work / Project Experience</label>
-<textarea class="brutalist-input w-full min-h-[90px] p-3 font-body-md text-body-md resize-none" id="cand-experience" placeholder="Roles and what you actually did — real detail, not just titles"></textarea>
-</div>
-<div class="flex flex-col gap-tight-gap">
-<label class="font-label-md text-label-md uppercase" for="cand-achievements">Key Achievements / Proof Points</label>
-<p class="font-body-md text-xs text-on-surface-variant">One per line. These are quoted close to verbatim on the evidence slide — write them the way you want them to appear.</p>
-<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="cand-achievements" placeholder="Grew newsletter from 0 to 12,000 subscribers in 8 months&#10;Cut onboarding drop-off from 40% to 22% by rebuilding the first-run flow&#10;Ran a 6-person case team to a national final"></textarea>
-<p class="field-error" id="achievements-error"></p>
+<textarea class="brutalist-input w-full min-h-[90px] p-3 font-body-md text-body-md resize-none" id="cand-education" placeholder="Degrees, institutions, years, notable coursework"></textarea>
 </div>
 <div class="flex flex-col gap-tight-gap">
 <label class="font-label-md text-label-md uppercase" for="cand-skills">Core Skills</label>
 <input class="brutalist-input w-full p-3 font-body-md text-body-md" id="cand-skills" type="text" placeholder="SQL, positioning, financial modelling, user research…"/>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-tight-gap">
+<label class="font-label-md text-label-md uppercase" for="cand-experience">Work / Project Experience</label>
+<textarea class="brutalist-input w-full min-h-[110px] p-3 font-body-md text-body-md resize-none" id="cand-experience" placeholder="Roles and what you actually did — real detail, not just titles"></textarea>
+</div>
+<div class="flex flex-col gap-tight-gap flex-1">
+<label class="font-label-md text-label-md uppercase" for="cand-achievements">Key Achievements / Proof Points</label>
+<p class="font-body-md text-xs text-on-surface-variant">One per line. These are quoted close to verbatim on the evidence slide — write them the way you want them to appear.</p>
+<textarea class="brutalist-input w-full min-h-[140px] md:flex-1 p-3 font-body-md text-body-md resize-none" id="cand-achievements" placeholder="Grew newsletter from 0 to 12,000 subscribers in 8 months&#10;Cut onboarding drop-off from 40% to 22% by rebuilding the first-run flow&#10;Ran a 6-person case team to a national final"></textarea>
+<p class="field-error" id="achievements-error"></p>
+</div>
+</div>
 </div>
 </fieldset>
 <div class="flex justify-between items-center">
@@ -758,12 +768,14 @@ Next: Pick Your Tone<span class="material-symbols-outlined text-base">arrow_forw
 </div>
 
 <!-- Step 3: Tone & Go -->
-<div class="wizard-panel hidden max-w-2xl mx-auto w-full flex flex-col gap-6" data-panel="3">
+<div class="wizard-panel hidden max-w-4xl mx-auto w-full flex flex-col gap-6" data-panel="3">
+<fieldset class="brief-group flex flex-col gap-4" style="border-top:5px solid #1c1b1b">
+<legend class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">edit_note</span>Strategic Tone</legend>
 <div class="flex flex-col gap-tight-gap">
-<label class="font-label-md text-label-md uppercase">Strategic Tone</label>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tone-toggle"></div>
 <p class="font-body-md text-xs text-on-surface-variant mt-1" id="tone-hint"></p>
 </div>
+</fieldset>
 <div class="flex justify-start">
 <button class="inline-flex items-center gap-2 px-5 py-2.5 font-label-md text-label-md uppercase border-2 border-on-background hover:bg-surface-variant transition-colors" data-wiz-back="2" type="button">
 <span class="material-symbols-outlined text-base">arrow_back</span>Back
